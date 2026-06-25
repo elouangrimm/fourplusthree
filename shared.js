@@ -128,20 +128,41 @@ function esc(s) {
   );
 }
 
+/* proxy resolver function for remote file/data assets */
 function pjURL(file) {
-  const target = file || BASE_URL + "puzzles";
+  let target = file || "puzzles.json";
 
-  // if it's already an absolute URL, don't prepend the local path
   if (target.startsWith("http://") || target.startsWith("https://")) {
     return target + (target.includes("?") ? "&" : "?") + "ts=" + Date.now();
   }
+
+  target = target.replace(/^\//, "");
+
+  const localAssets = [
+    "index.html",
+    "archive.html",
+    "build.html",
+    "scoring.html",
+    "shared.js",
+    "shared.css",
+    "sw.js",
+    "manifest.json",
+  ];
+  if (localAssets.includes(target.split("?")[0])) {
+    const divider = target.includes("?") ? "&" : "?";
+    return target + divider + "ts=" + Date.now();
+  }
+
+  target = BASE_URL + target;
 
   let dir = location.pathname;
   if (!/\/$/.test(dir)) {
     if (/\.[^/]+$/.test(dir)) dir = dir.replace(/[^/]*$/, "");
     else dir += "/";
   }
-  return dir + target + "?ts=" + Date.now();
+
+  const separator = target.includes("?") ? "&" : "?";
+  return dir + target + separator + "ts=" + Date.now();
 }
 
 /* ---------- clipboard ---------- */
