@@ -54,7 +54,9 @@
                     const r = await fetch(pjURL(), { cache: "no-store" });
                     if (r.ok) data = await r.json();
                     else failed = true;
+                    console.log("it worked");
                 } catch (e) {
+                    console.log("nope");
                     failed = true;
                 }
                 data = data || {};
