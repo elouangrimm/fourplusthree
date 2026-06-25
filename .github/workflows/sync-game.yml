@@ -2,7 +2,7 @@ name: Check Hank Green 4x3 Updates
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Everyday at midnight
+    - cron: "0 0 * * *" # Everyday at midnight
   workflow_dispatch: # Allows manual trigger
 
 permissions:
@@ -64,7 +64,7 @@ jobs:
                   HAS_CHANGES="true"
                   mv remote_mirror_temp "$file"
                   DISCORD_SUMMARY="$DISCORD_SUMMARY
-🆕 **New File Added**: \`$file\`"
+                  🆕 **New File Added**: \`$file\`"
               else
                   if ! cmp -s "$file" remote_mirror_temp; then
                       HAS_CHANGES="true"
@@ -75,14 +75,14 @@ jobs:
                               ADDED=$(echo "$DIFF_STATS" | awk '{print $1}')
                               DELETED=$(echo "$DIFF_STATS" | awk '{print $2}')
                               DISCORD_SUMMARY="$DISCORD_SUMMARY
-⚠️ **Modified**: \`$file\` (+${ADDED} lines, -${DELETED} lines)"
+                              ⚠️ **Modified**: \`$file\` (+${ADDED} lines, -${DELETED} lines)"
                           else
                               DISCORD_SUMMARY="$DISCORD_SUMMARY
-⚠️ **Modified**: \`$file\`"
+                              ⚠️ **Modified**: \`$file\`"
                           fi
                       else
                           DISCORD_SUMMARY="$DISCORD_SUMMARY
-🖼️ **Modified Image**: \`$file\`"
+                          🖼️ **Modified Image**: \`$file\`"
                       fi
                       mv remote_mirror_temp "$file"
                   else
@@ -121,10 +121,10 @@ jobs:
           # Construct dynamic payload block cleanly using multi-line template injection strings
           # Using literal breaks instead of \n to fix Discord's text engine presentation formatting
           CONTENT="## 🧩 4 × 3 Game Update Report
-Changes detected between yesterday's version and Hank Green's live site:
-$AUDIT_SUMMARY
+          Changes detected between yesterday's version and Hank Green's live site:
+            $AUDIT_SUMMARY
 
-🔗 View live site: https://hankgreen.com/fourbythree"
+          🔗 View live site: https://hankgreen.com/fourbythree"
 
           PAYLOAD=$(jq -n --arg msg "$CONTENT" '{content: $msg}')
 
