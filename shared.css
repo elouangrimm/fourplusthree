@@ -767,6 +767,9 @@ footer a:focus-visible {
 .archlist button:hover {
     background: #f1ece2;
 }
+.a11y-dm .archlist button:hover {
+    background: #2a241a;
+}
 .archlist button.cur {
     border-color: var(--ink);
 }

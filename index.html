@@ -314,32 +314,70 @@
                 }
                 if (!puzzle) {
                     /* no link (or an #d= archive date): load from puzzles.json — that specific
-                     day if given and valid, otherwise the most recent entry ≤ today */
+                       day if given and valid, otherwise the most recent entry ≤ today */
                     try {
                         const r = await fetch(pjURL(), { cache: "no-store" });
+
+                        let data;
                         if (r.ok) {
-                            const data = await r.json();
-                            puzzleData = data;
-                            const today = todayStr();
-                            let k = null;
-                            if (
-                                archiveDate &&
-                                data[archiveDate] &&
-                                archiveDate <= today
-                            ) {
-                                k = archiveDate;
-                            } else {
-                                const keys = Object.keys(data)
-                                    .filter((k) => k <= today)
-                                    .sort();
-                                if (keys.length) k = keys[keys.length - 1];
-                            }
-                            if (k) {
-                                puzzle = decPuzzle(data[k]);
-                                dailyKey = k;
-                            }
+                            data = await r.json();
+                        } else {
+                            throw new Error("Primary proxy failed");
                         }
-                    } catch (e) {}
+
+                        puzzleData = data;
+                        const today = todayStr();
+                        let k = null;
+                        if (
+                            archiveDate &&
+                            data[archiveDate] &&
+                            (A11Y.fd || archiveDate <= today) // Support your spoiler menu toggle safely
+                        ) {
+                            k = archiveDate;
+                        } else {
+                            const keys = Object.keys(data)
+                                .filter((k) => k <= today)
+                                .sort();
+                            if (keys.length) k = keys[keys.length - 1];
+                        }
+                        if (k) {
+                            puzzle = decPuzzle(data[k]);
+                            dailyKey = k;
+                        }
+                    } catch (e) {
+                        try {
+                            const rLocal = await fetch("puzzles.json", {
+                                cache: "no-store",
+                            });
+                            if (rLocal.ok) {
+                                const data = await rLocal.json();
+                                puzzleData = data;
+                                const today = todayStr();
+                                let k = null;
+                                if (
+                                    archiveDate &&
+                                    data[archiveDate] &&
+                                    (A11Y.fd || archiveDate <= today)
+                                ) {
+                                    k = archiveDate;
+                                } else {
+                                    const keys = Object.keys(data)
+                                        .filter((k) => k <= today)
+                                        .sort();
+                                    if (keys.length) k = keys[keys.length - 1];
+                                }
+                                if (k) {
+                                    puzzle = decPuzzle(data[k]);
+                                    dailyKey = k;
+                                }
+                            }
+                        } catch (localErr) {
+                            console.error(
+                                "All puzzle fetch attempts failed:",
+                                localErr,
+                            );
+                        }
+                    }
                 }
                 if (!puzzle) puzzle = DEMO;
                 setupPlay();
@@ -349,13 +387,20 @@
                 document.getElementById("betaBanner").style.display = isBeta
                     ? ""
                     : "none";
-                /* today's daily shows no date line at all; archived (past) puzzles get a dated pill; custom puzzles show a custom pill */
+
                 let sub = "";
-                if (dailyKey && dailyKey !== todayStr()) {
-                    sub = fmtDate(dailyKey);
-                } else if (!dailyKey) {
+
+                if (dailyKey) {
+                    if (dailyKey !== todayStr()) {
+                        sub = fmtDate(dailyKey);
+                    } else {
+                        sub = ""; // It is today's live daily puzzle
+                    }
+                } else {
+                    // dailyKey is null/falsy, so it is definitely a custom built puzzle link
                     sub = isBeta ? "Beta Custom Puzzle" : "Custom Puzzle";
                 }
+
                 const ps = document.getElementById("pSub");
                 ps.textContent = sub;
                 ps.classList.remove("today");

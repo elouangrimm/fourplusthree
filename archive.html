@@ -50,55 +50,104 @@
                 el.innerHTML = "<div class='hint'>Loading…</div>";
                 let data = null,
                     failed = false;
+
                 try {
                     const r = await fetch(pjURL(), { cache: "no-store" });
-                    if (r.ok) data = await r.json();
-                    else failed = true;
-                    console.log("it worked");
+                    if (r.ok) {
+                        data = await r.json();
+                    } else {
+                        throw new Error("Fetching puzzles.json failed");
+                    }
                 } catch (e) {
-                    console.log("nope");
-                    failed = true;
+                    const r = await fetch("puzzles.json", {
+                        cache: "no-store",
+                    });
+                    if (r.ok) {
+                        data = await r.json();
+                    } else {
+                        failed = true;
+                    }
                 }
+
                 data = data || {};
                 const today = todayStr();
                 const showFuture = !!A11Y.fd;
+
+                // Filter and sort keys descending (newest first)
                 const keys = Object.keys(data)
                     .filter((k) => showFuture || k <= today)
                     .sort()
                     .reverse();
+
                 if (!keys.length) {
                     el.innerHTML =
                         "<div class='hint'>" +
                         (failed
-                            ? "Couldn't load the puzzle list — if you opened this file directly, run it through a local server or the live site so it can fetch puzzles.json."
+                            ? "Couldn't load the puzzle list."
                             : "No puzzles yet.") +
                         "</div>";
                     return;
                 }
+
                 el.innerHTML = "";
+
+                // Create a dedicated container for future items if needed
+                let futureContainer = null;
+                if (showFuture && keys.some((k) => k > today)) {
+                    const details = document.createElement("details");
+                    details.className = "future-spoiler";
+                    details.style.marginBottom = "1em";
+
+                    const summary = document.createElement("summary");
+                    summary.textContent = " Future Puzzles (Spoilers!)";
+                    summary.style.cursor = "pointer";
+                    summary.style.fontWeight = "bold";
+                    summary.style.padding = "0.5em 0";
+
+                    futureContainer = document.createElement("div");
+                    futureContainer.style.display = "flex";
+                    futureContainer.style.flexDirection = "column";
+                    futureContainer.style.gap = "8px";
+                    futureContainer.style.marginTop = "0.5em";
+
+                    details.appendChild(summary);
+                    details.appendChild(futureContainer);
+                    el.appendChild(details);
+                }
+
                 keys.forEach((k) => {
                     const b = document.createElement("button");
                     const isToday = k === today;
                     const isFuture = k > today;
+
                     b.innerHTML =
                         "<span>" +
                         esc(fmtDate(k)) +
                         "</span>" +
                         "<span class='when'>" +
-                        (isToday
-                            ? "Today"
-                            : isFuture
-                              ? "Future (Spoiler!)"
-                              : "") +
+                        (isToday ? "Today" : isFuture ? "Future" : "") +
                         "</span>";
+
                     if (isFuture) {
                         b.style.borderColor = "var(--bad)";
                         b.style.borderWidth = "2px";
                     }
+
+                    if (isToday) {
+                        b.style.borderColor = "var(--good)";
+                        b.style.borderWidth = "2px";
+                    }
+
                     b.onclick = () => {
                         location.href = "index.html#d=" + k;
                     };
-                    el.appendChild(b);
+
+                    // Append to the spoiler drawer if it's a future puzzle, otherwise append normally
+                    if (isFuture && futureContainer) {
+                        futureContainer.appendChild(b);
+                    } else {
+                        el.appendChild(b);
+                    }
                 });
             }
             renderArchive();
