@@ -149,6 +149,17 @@ function esc(s) {
 function pjURL(file) {
   let target = file || "puzzles.json";
 
+  if (target.startsWith("http://") || target.startsWith("https://")) {
+    const separator = target.includes("?") ? "&" : "?";
+    return (
+      "api/proxy?path=" +
+      encodeURIComponent(target) +
+      separator +
+      "ts=" +
+      Date.now()
+    );
+  }
+
   target = target.replace(/^\//, "");
 
   const localAssets = [
@@ -161,27 +172,16 @@ function pjURL(file) {
     "sw.js",
     "manifest.json",
   ];
+
   if (localAssets.includes(target.split("?")[0])) {
     const divider = target.includes("?") ? "&" : "?";
     return target + divider + "ts=" + Date.now();
   }
 
-  internalTarget = BASE_URL + target;
   target = BASE_URL + target;
 
-  let dir = location.pathname;
-  if (!/\/$/.test(dir)) {
-    if (/\.[^/]+$/.test(dir)) dir = dir.replace(/[^/]*$/, "");
-    else dir += "/";
-  }
-
   const separator = target.includes("?") ? "&" : "?";
-
-  if (target.startsWith("http://") || target.startsWith("https://")) {
-    return dir + target + separator + "ts=" + Date.now();
-  } else {
-    return dir + internalTarget + separator + "ts=" + Date.now();
-  }
+  return target + separator + "ts=" + Date.now();
 }
 
 /* ---------- clipboard ---------- */

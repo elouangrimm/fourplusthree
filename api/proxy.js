@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   }
 
   // Reconstruct the destination URL on Hank's server
-  const targetUrl = new URL(`https://hankgreen.com/fourbythree/${path}`);
+  const targetUrl = new URL(`${path}`);
 
   // Forward any incoming query parameters (like ?w=5941331 or ?ts=...)
   Object.keys(queryParams).forEach((key) => {
