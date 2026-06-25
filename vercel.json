@@ -1,5 +1,12 @@
 {
   "rewrites": [
-    { "source": "/api/proxy/(.*)", "destination": "/api/proxy?path=$1" }
+    {
+      "source": "/api/internal-proxy/(.*)",
+      "destination": "/api/proxy?path=https://hankgreen.com/fourbythree/$1"
+    },
+    {
+      "source": "/api/proxy/(.*)",
+      "destination": "/api/proxy?path=$1"
+    }
   ]
 }
