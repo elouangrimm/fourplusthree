@@ -22,7 +22,7 @@ function reduceMotion() {
   c.toggle("a11y-nr", !!A11Y.nr);
 })();
 
-const BASE_URL = "api/proxy/";
+const BASE_URL = "api/internal-proxy/";
 
 /* category palette: 0 blue, 1 green, 2 yellow, 3 purple. "Labeled colors" mode keeps
    these and just adds the colour's name to each solved tile (no recolouring). */
@@ -149,10 +149,6 @@ function esc(s) {
 function pjURL(file) {
   let target = file || "puzzles.json";
 
-  if (target.startsWith("http://") || target.startsWith("https://")) {
-    return target + (target.includes("?") ? "&" : "?") + "ts=" + Date.now();
-  }
-
   target = target.replace(/^\//, "");
 
   const localAssets = [
@@ -170,6 +166,7 @@ function pjURL(file) {
     return target + divider + "ts=" + Date.now();
   }
 
+  internalTarget = BASE_URL + target;
   target = BASE_URL + target;
 
   let dir = location.pathname;
@@ -179,7 +176,12 @@ function pjURL(file) {
   }
 
   const separator = target.includes("?") ? "&" : "?";
-  return dir + target + separator + "ts=" + Date.now();
+
+  if (target.startsWith("http://") || target.startsWith("https://")) {
+    return dir + target + separator + "ts=" + Date.now();
+  } else {
+    return dir + internalTarget + separator + "ts=" + Date.now();
+  }
 }
 
 /* ---------- clipboard ---------- */
