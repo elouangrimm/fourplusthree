@@ -1167,7 +1167,8 @@
                    while still sharing one cached result (one X read) across everyone in that window */
                 try {
                     const r = await fetch(
-                        "/api/hubpoll?w=" + Math.floor(Date.now() / 300000),
+                        "https://www.hankgreen.com/api/hubpoll?w=" +
+                            Math.floor(Date.now() / 300000),
                     );
                     if (r.ok) {
                         const j = await r.json();
