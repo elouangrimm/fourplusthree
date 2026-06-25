@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>4 × 3 — Scoring</title>
+        <script>
+            (function () {
+                var p = location.pathname;
+                if (!/\/$/.test(p)) {
+                    if (/\.[^\/]+$/.test(p)) p = p.replace(/[^\/]*$/, "");
+                    else p += "/";
+                }
+                var b = document.createElement("base");
+                b.setAttribute("href", p);
+                document.head.appendChild(b);
+            })();
+        </script>
+        <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+        <link rel="stylesheet" href="shared.css" />
+        <script src="shared.js"></script>
+        <script defer src="/_vercel/insights/script.js"></script>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <a href="index.html" style="display: block"
+                    ><img class="logo" src="logo.png" alt="4 × 3"
+                /></a>
+                <div class="tag">How the points work.</div>
+            </header>
+            <div class="card">
+                <b>Scoring</b>
+                <div id="scoringBody"></div>
+            </div>
+            <footer>
+                <a href="index.html">← back to the game</a> ·
+                <a href="archive.html">past puzzles</a> ·
+                <a href="build.html">build your own</a> ·
+                <a href="history.html">history</a>
+            </footer>
+        </div>
+        <script>
+            "use strict";
+            function renderScoring() {
+                const row = (l, v, cls) =>
+                    "<div class='srow'><span>" +
+                    l +
+                    "</span><span class='v " +
+                    (cls || "") +
+                    "'>" +
+                    v +
+                    "</span></div>";
+                const note = (l, d) =>
+                    "<div class='srow'><span>" +
+                    l +
+                    "</span><span class='sd'>" +
+                    d +
+                    "</span></div>";
+                document.getElementById("scoringBody").innerHTML =
+                    "<div class='hint'>Every win starts at 100 points. Lose points for mistakes, gain them for flair, then add your streak. A flawless run tops out at a clean 200 (plus your streak).</div>" +
+                    "<div class='scoresec'><b>Mistakes</b>" +
+                    row("Each mistake", "−" + MISS, "bad") +
+                    row(
+                        "A slip with only two groups left",
+                        "−" + MISS_LATE,
+                        "bad",
+                    ) +
+                    "</div>" +
+                    "<div class='scoresec'><b>Bonuses</b>" +
+                    row(
+                        "Hub First — lead every guess with the shared word",
+                        "+" + HUB_BONUS,
+                        "good",
+                    ) +
+                    row(
+                        "Hub Middle — place the shared word second every guess",
+                        "+" + HUB_MID_BONUS,
+                        "good",
+                    ) +
+                    row(
+                        "Blue First — solve the blue group first",
+                        "+" + BLUE_BONUS,
+                        "good",
+                    ) +
+                    row(
+                        "Purple First — solve the purple group first",
+                        "+" + PURPLE_BONUS,
+                        "good",
+                    ) +
+                    row(
+                        "Reverse Rainbow — purple → blue → green → yellow",
+                        "+" + RAINBOW_BONUS,
+                        "good",
+                    ) +
+                    row(
+                        "Sub-90s — finish in under 90 seconds",
+                        "+" + SPEED_BONUS,
+                        "good",
+                    ) +
+                    row(
+                        "Daily streak — for each day of your current streak",
+                        "+1 / day",
+                        "good",
+                    ) +
+                    row(
+                        "Tap the ad — give the day's ad a click",
+                        "+" + AD_BONUS,
+                        "good",
+                    ) +
+                    "</div>" +
+                    "<div class='scoresec'><b>Just for bragging (no points)</b>" +
+                    note("🌈 Rainbow", "Solve yellow → green → blue → purple") +
+                    note("🎾 Grellow", "Solve purple → blue → yellow → green") +
+                    note("🦚 Grue", "Solve purple → green → blue → yellow") +
+                    note(
+                        "😤 God Damnit!",
+                        "A perfect run (no mistakes + Hub First) ruined only by a green↔yellow or green↔blue swap",
+                    ) +
+                    note(
+                        "🌙 The Day Before",
+                        "Play the day's puzzle between midnight and 1 am",
+                    ) +
+                    "</div>" +
+                    "<div class='scoresec'><b>Top honors</b>" +
+                    note(
+                        "Perfect Game",
+                        "0 mistakes + Hub First + Reverse Rainbow → a clean 200 (before your streak)",
+                    ) +
+                    note(
+                        "🥇 Gold plaque",
+                        "A perfect game in under 90 seconds",
+                    ) +
+                    note(
+                        "🥈 Silver plaque",
+                        "A perfect game in under 120 seconds",
+                    ) +
+                    "</div>" +
+                    "<div class='scoresec'><b>Rule breaker</b>" +
+                    row(
+                        "RULE BREAKER — put the shared word LAST in every guess",
+                        RULE_BREAKER_SCORE,
+                        "bad",
+                    ) +
+                    note(
+                        "",
+                        "Wipes every point you earned — score and streak bonus included — and leaves you at " +
+                            RULE_BREAKER_SCORE +
+                            ". The shared word is meant to lead, not trail.",
+                    ) +
+                    "</div>";
+            }
+            renderScoring();
+        </script>
+    </body>
+</html>

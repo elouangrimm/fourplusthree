@@ -38,6 +38,8 @@ const COLORS = [...BASE_COLORS];
 const TINTS = [...BASE_TINTS];
 const MIDC = [...BASE_MIDC];
 
+const logo = document.getElementsByClassName("logo");
+
 function updateThemeColors() {
   const isDark = !!A11Y.dm;
   for (let i = 0; i < 4; i++) {
@@ -45,8 +47,23 @@ function updateThemeColors() {
     TINTS[i] = isDark ? DARK_TINTS[i] : BASE_TINTS[i];
     MIDC[i] = isDark ? DARK_MIDC[i] : BASE_MIDC[i];
   }
+  const logoEl = document.querySelector(".logo");
+  const fishEl = document.querySelector(".fish");
+  if (logoEl) {
+    logoEl.src = isDark ? "logo-dark.png" : "logo.png";
+  }
+  if (fishEl) {
+    fishEl.src = isDark ? "fish-dark.png" : "fish.png";
+  }
 }
-updateThemeColors();
+updateThemeColors(); // run to set the colors quickly
+
+// run again after the dom loads to fix logos
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", updateThemeColors);
+} else {
+  updateThemeColors();
+}
 
 const COLOR_NAMES = ["blue", "green", "yellow", "purple"];
 

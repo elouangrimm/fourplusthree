@@ -817,14 +817,8 @@ footer a:focus-visible {
 .srow .sd {
     color: var(--ink);
     font-size: 11px;
-}
-.srow .sd {
-    color: var(--ink);
-    font-size: 11px;
-}
-.srow .sd {
-    color: var(--ink);
-    font-size: 11px;
+    text-align: right;
+    max-width: 56%;
 }
 /* rounded card; effects STACK so combined results read together */
 /* secret reset code: ↑ ↑ ↓ ↓ ↑ ↑ ----------
