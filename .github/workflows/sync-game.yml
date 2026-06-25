@@ -93,19 +93,20 @@ jobs:
         if: steps.audit.outputs.has_changes == 'true'
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          AUDIT_SUMMARY: ${{ steps.audit.outputs.summary }}
         run: |
           if [ -z "$DISCORD_WEBHOOK" ]; then
             echo "Error: DISCORD_WEBHOOK secret is missing!"
             exit 1
           fi
 
-          # Construct clean JSON payload for Discord API execution
-          CONTENT="## 🧩 4 × 3 Game Update Report\nChanges detected between your repository and Hank Green's live site:\n${{ steps.audit.outputs.summary }}\n\n🔗 View live site: https://hankgreen.com/fourbythree"
+          # Construct clean JSON payload using the environment variable safely
+          CONTENT="## 🧩 4 × 3 Game Update Report\nChanges detected between your repository and Hank Green's live site:\n$AUDIT_SUMMARY\n\n🔗 View live site: https://hankgreen.com/fourbythree"
 
           # Escape JSON characters securely
           PAYLOAD=$(jq -n --arg msg "$CONTENT" '{content: $msg}')
 
           curl -H "Content-Type: application/json" \
-               -X POST \
-               -d "$PAYLOAD" \
-               "$DISCORD_WEBHOOK"
+                -X POST \
+                -d "$PAYLOAD" \
+                "$DISCORD_WEBHOOK"
