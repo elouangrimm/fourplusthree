@@ -22,7 +22,7 @@ function reduceMotion() {
   c.toggle("a11y-nr", !!A11Y.nr);
 })();
 
-const BASE_URL = "https://hankgreen.com/fourbythree/";
+const BASE_URL = "api/";
 
 /* category palette: 0 blue, 1 green, 2 yellow, 3 purple. "Labeled colors" mode keeps
    these and just adds the colour's name to each solved tile (no recolouring). */
