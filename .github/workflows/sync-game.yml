@@ -2,10 +2,11 @@ name: Check Hank Green 4x3 Updates
 
 on:
   schedule:
-    # Runs everyday at midnight UTC (00:00)
-    - cron: "0 0 * * *"
-  workflow_dispatch:
-    # Allows you to trigger this manually from the GitHub UI if you want to test it
+    - cron: '0 0 * * *' # Everyday at midnight
+  workflow_dispatch: # Allows manual trigger
+
+permissions:
+  contents: write # Allows the bot to save live files back to your repo
 
 jobs:
   check-changes:
@@ -13,13 +14,14 @@ jobs:
     steps:
       - name: Checkout local repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all branches
 
       - name: Fetch Live Assets and Audit Code
         id: audit
         env:
           BASE_URL: "https://hankgreen.com/fourbythree"
         run: |
-          # 1. Define original production assets (excluding sw.js and manifest.json)
           FILES=(
             "index.html"
             "archive.html"
@@ -28,65 +30,81 @@ jobs:
             "shared.js"
             "shared.css"
             "favicon.svg"
-            "logo.png"
-            "logo-dark.png"
-            "fish.png"
-            "fish-dark.png"
             "puzzles.json"
           )
 
           mkdir -p remote_mirror
 
-          NEW_LIST=""
-          CHANGED_LIST=""
+          # Try to check out a cache branch containing the *previous* live run files
+          # If it doesn't exist, it will create one cleanly based on your main branch
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git show-ref --verify --quiet refs/remotes/origin/live-upstream; then
+              git checkout live-upstream
+          else
+              git checkout -b live-upstream
+          fi
+
           DISCORD_SUMMARY=""
           HAS_CHANGES="false"
 
           echo "Fetching assets from $BASE_URL..."
 
           for file in "${FILES[@]}"; do
-              # Download live production file
-              if ! curl -sLf "$BASE_URL/$file" -o "remote_mirror/$file"; then
+              # Download live production file into root directory of the tracking branch
+              if ! curl -sLf "$BASE_URL/$file" -o "remote_mirror_temp"; then
                   echo "Warning: Failed to download $file"
+                  rm -f remote_mirror_temp
                   continue
               fi
 
-              # Case 1: File is missing locally
+              # Check against what was stored in live-upstream historically
               if [ ! -f "$file" ]; then
                   HAS_CHANGES="true"
-                  NEW_LIST="$NEW_LIST\n- \`$file\`"
-                  DISCORD_SUMMARY="$DISCORD_SUMMARY\n🆕 **New File**: \`$file\` was added to production."
-
-              # Case 2: File exists, check for structural differences
+                  mv remote_mirror_temp "$file"
+                  DISCORD_SUMMARY="$DISCORD_SUMMARY
+🆕 **New File Added**: \`$file\`"
               else
-                  if ! cmp -s "$file" "remote_mirror/$file"; then
+                  if ! cmp -s "$file" remote_mirror_temp; then
                       HAS_CHANGES="true"
-                      CHANGED_LIST="$CHANGED_LIST\n- \`$file\`"
 
-                      # If text asset, get line change metrics
                       if [[ "$file" =~ \.(html|js|css|json|svg)$ ]]; then
-                          # Run diff and count changes
-                          DIFF_STATS=$(diff --numstat "$file" "remote_mirror/$file" 2>/dev/null || true)
+                          DIFF_STATS=$(diff --numstat "$file" remote_mirror_temp 2>/dev/null || true)
                           if [ ! -z "$DIFF_STATS" ]; then
                               ADDED=$(echo "$DIFF_STATS" | awk '{print $1}')
                               DELETED=$(echo "$DIFF_STATS" | awk '{print $2}')
-                              DISCORD_SUMMARY="$DISCORD_SUMMARY\n⚠️ **Modified**: \`$file\` (+${ADDED} lines, -${DELETED} lines)"
+                              DISCORD_SUMMARY="$DISCORD_SUMMARY
+⚠️ **Modified**: \`$file\` (+${ADDED} lines, -${DELETED} lines)"
                           else
-                              DISCORD_SUMMARY="$DISCORD_SUMMARY\n⚠️ **Modified**: \`$file\`"
+                              DISCORD_SUMMARY="$DISCORD_SUMMARY
+⚠️ **Modified**: \`$file\`"
                           fi
                       else
-                          DISCORD_SUMMARY="$DISCORD_SUMMARY\n🖼️ **Modified Image**: \`$file\`"
+                          DISCORD_SUMMARY="$DISCORD_SUMMARY
+🖼️ **Modified Image**: \`$file\`"
                       fi
+                      mv remote_mirror_temp "$file"
+                  else
+                      # File is identical to yesterday's live version
+                      rm remote_mirror_temp
                   fi
               fi
           done
 
-          # Export variable states safely for subsequent steps using GitHub environment files
+          # Save changes to the live tracking branch if any updates were caught
+          if [ "$HAS_CHANGES" = "true" ]; then
+              git add .
+              git commit -m "Automated upstream update sync: $(date -u +'%Y-%m-%d %H:%M UTC')"
+              git push origin live-upstream
+          fi
+
+          # Export properties cleanly
           echo "has_changes=$HAS_CHANGES" >> $GITHUB_OUTPUT
 
-          # Multiline output variables trick for GitHub Actions
+          # Multi-line handling using unique delimiters
           echo "summary<<EOF" >> $GITHUB_OUTPUT
-          echo -e "$DISCORD_SUMMARY" >> $GITHUB_OUTPUT
+          echo "$DISCORD_SUMMARY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Send Summary to Discord
@@ -100,13 +118,17 @@ jobs:
             exit 1
           fi
 
-          # Construct clean JSON payload using the environment variable safely
-          CONTENT="## 🧩 4 × 3 Game Update Report\nChanges detected between your repository and Hank Green's live site:\n$AUDIT_SUMMARY\n\n🔗 View live site: https://hankgreen.com/fourbythree"
+          # Construct dynamic payload block cleanly using multi-line template injection strings
+          # Using literal breaks instead of \n to fix Discord's text engine presentation formatting
+          CONTENT="## 🧩 4 × 3 Game Update Report
+Changes detected between yesterday's version and Hank Green's live site:
+$AUDIT_SUMMARY
 
-          # Escape JSON characters securely
+🔗 View live site: https://hankgreen.com/fourbythree"
+
           PAYLOAD=$(jq -n --arg msg "$CONTENT" '{content: $msg}')
 
           curl -H "Content-Type: application/json" \
-                -X POST \
-                -d "$PAYLOAD" \
-                "$DISCORD_WEBHOOK"
+               -X POST \
+               -d "$PAYLOAD" \
+               "$DISCORD_WEBHOOK"
