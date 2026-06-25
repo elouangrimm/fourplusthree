@@ -128,11 +128,8 @@ function esc(s) {
   );
 }
 
-/* puzzles.json lives next to these pages — resolve it against the page's own
-   folder so it loads whether the URL is /fourbythree, /fourbythree/, or
-   /fourbythree/index.html (a bare "puzzles.json" would otherwise hit the root) */
 function pjURL(file) {
-  const target = file || BASE_URL + "puzzles.json";
+  const target = file || BASE_URL + "puzzles";
 
   // if it's already an absolute URL, don't prepend the local path
   if (target.startsWith("http://") || target.startsWith("https://")) {
