@@ -368,7 +368,7 @@ function checkAndShowNotification(reg) {
       reg.showNotification("4 × 3 Daily Reminder", {
         body: "Time for your daily 4 × 3 puzzle! Can you solve it today? 🧩",
         icon: "favicon.svg",
-        badge: "favicon-32.png",
+        badge: "favicon.svg",
         tag: "daily-reminder",
         renotify: true,
       });
