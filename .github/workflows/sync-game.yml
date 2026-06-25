@@ -1,0 +1,111 @@
+name: Check Hank Green 4x3 Updates
+
+on:
+  schedule:
+    # Runs everyday at midnight UTC (00:00)
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+    # Allows you to trigger this manually from the GitHub UI if you want to test it
+
+jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout local repository
+        uses: actions/checkout@v4
+
+      - name: Fetch Live Assets and Audit Code
+        id: audit
+        env:
+          BASE_URL: "https://hankgreen.com/fourbythree"
+        run: |
+          # 1. Define original production assets (excluding sw.js and manifest.json)
+          FILES=(
+            "index.html"
+            "archive.html"
+            "build.html"
+            "scoring.html"
+            "shared.js"
+            "shared.css"
+            "favicon.svg"
+            "logo.png"
+            "logo-dark.png"
+            "fish.png"
+            "fish-dark.png"
+            "puzzles.json"
+          )
+
+          mkdir -p remote_mirror
+
+          NEW_LIST=""
+          CHANGED_LIST=""
+          DISCORD_SUMMARY=""
+          HAS_CHANGES="false"
+
+          echo "Fetching assets from $BASE_URL..."
+
+          for file in "${FILES[@]}"; do
+              # Download live production file
+              if ! curl -sLf "$BASE_URL/$file" -o "remote_mirror/$file"; then
+                  echo "Warning: Failed to download $file"
+                  continue
+              fi
+
+              # Case 1: File is missing locally
+              if [ ! -f "$file" ]; then
+                  HAS_CHANGES="true"
+                  NEW_LIST="$NEW_LIST\n- \`$file\`"
+                  DISCORD_SUMMARY="$DISCORD_SUMMARY\n🆕 **New File**: \`$file\` was added to production."
+
+              # Case 2: File exists, check for structural differences
+              else
+                  if ! cmp -s "$file" "remote_mirror/$file"; then
+                      HAS_CHANGES="true"
+                      CHANGED_LIST="$CHANGED_LIST\n- \`$file\`"
+
+                      # If text asset, get line change metrics
+                      if [[ "$file" =~ \.(html|js|css|json|svg)$ ]]; then
+                          # Run diff and count changes
+                          DIFF_STATS=$(diff --numstat "$file" "remote_mirror/$file" 2>/dev/null || true)
+                          if [ ! -z "$DIFF_STATS" ]; then
+                              ADDED=$(echo "$DIFF_STATS" | awk '{print $1}')
+                              DELETED=$(echo "$DIFF_STATS" | awk '{print $2}')
+                              DISCORD_SUMMARY="$DISCORD_SUMMARY\n⚠️ **Modified**: \`$file\` (+${ADDED} lines, -${DELETED} lines)"
+                          else
+                              DISCORD_SUMMARY="$DISCORD_SUMMARY\n⚠️ **Modified**: \`$file\`"
+                          fi
+                      else
+                          DISCORD_SUMMARY="$DISCORD_SUMMARY\n🖼️ **Modified Image**: \`$file\`"
+                      fi
+                  fi
+              fi
+          done
+
+          # Export variable states safely for subsequent steps using GitHub environment files
+          echo "has_changes=$HAS_CHANGES" >> $GITHUB_OUTPUT
+
+          # Multiline output variables trick for GitHub Actions
+          echo "summary<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$DISCORD_SUMMARY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send Summary to Discord
+        if: steps.audit.outputs.has_changes == 'true'
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "Error: DISCORD_WEBHOOK secret is missing!"
+            exit 1
+          fi
+
+          # Construct clean JSON payload for Discord API execution
+          CONTENT="## 🧩 4 × 3 Game Update Report\nChanges detected between your repository and Hank Green's live site:\n${{ steps.audit.outputs.summary }}\n\n🔗 View live site: https://hankgreen.com/fourbythree"
+
+          # Escape JSON characters securely
+          PAYLOAD=$(jq -n --arg msg "$CONTENT" '{content: $msg}')
+
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "$PAYLOAD" \
+               "$DISCORD_WEBHOOK"
