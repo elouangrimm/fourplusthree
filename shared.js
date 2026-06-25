@@ -49,8 +49,12 @@ function updateThemeColors() {
   }
   const logoEl = document.querySelector(".logo");
   const fishEl = document.querySelector(".fish");
+  const githubEl = document.querySelector(".github");
   if (logoEl) {
     logoEl.src = isDark ? "logo-dark.png" : "logo.png";
+  }
+  if (githubEl) {
+    githubEl.src = isDark ? "github-dark.png" : "github.png";
   }
   if (fishEl) {
     fishEl.src = isDark ? "fish-dark.png" : "fish.png";
