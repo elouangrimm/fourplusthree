@@ -1,163 +1,419 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>4 × 3 — Your history</title>
-<script>(function(){var p=location.pathname;if(!/\/$/.test(p)){if(/\.[^\/]+$/.test(p))p=p.replace(/[^\/]*$/,"");else p+="/";}var b=document.createElement("base");b.setAttribute("href",p);document.head.appendChild(b);})();</script>
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="stylesheet" href="shared.css">
-<script src="shared.js"></script>
-<script defer src="/_vercel/insights/script.js"></script>
-</head>
-<body>
-<div class="wrap">
-  <header>
-    <a href="index.html" style="display:block"><img class="logo" src="fourbythreelogo.png" alt="4 × 3"></a>
-  </header>
-  <div class="card">
-    <b>Your history</b>
-    <div id="summary"></div>
-    <div id="achievements"></div>
-    <div id="histList" class="histlist"></div>
-    <div class="hint" id="privacy" style="margin-top:18px">Saved on this device only… no data leaves your browser. Clearing site data will reset this. Viewing from another browser or device will not show this data.</div>
-  </div>
-  <footer>
-    <a href="index.html">← back to the game</a> · <a href="scoring.html">scoring</a> · <a href="archive.html">past puzzles</a> · <a href="build.html">build your own</a>
-  </footer>
-</div>
-<div id="deftip"></div>
-<div id="cardLightbox"><img alt="Share card"></div>
-<script>
-"use strict";
-function loadHistory(){ try{return JSON.parse(localStorage.getItem("x43_history")||"{}");}catch(e){return {};} }
-function loadCards(){ try{return JSON.parse(localStorage.getItem("x43_cards")||"{}");}catch(e){return {};} }
-let CARDS={};
-function fmtTime(ms){
-  if(ms==null) return "";
-  const s=Math.round(ms/1000); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
-}
-function dayNum(k){ return Math.round(new Date(k+"T12:00:00").getTime()/86400000); }
-/* streak over release-day plays only (archive replays don't count) */
-function streaks(relKeys){
-  if(!relKeys.length) return {cur:0,max:0};
-  const nums=relKeys.map(dayNum).sort((a,b)=>a-b);
-  let max=1, run=1;
-  for(let i=1;i<nums.length;i++){ run=(nums[i]===nums[i-1]+1)?run+1:1; if(run>max) max=run; }
-  const today=dayNum(todayStr()), last=nums[nums.length-1];
-  let cur=0;
-  if(last===today||last===today-1){ cur=1; for(let i=nums.length-1;i>0;i--){ if(nums[i]===nums[i-1]+1) cur++; else break; } }
-  return {cur,max};
-}
-/* every point-affecting result is an achievement; shown as a single emoji + tooltip */
-const ACHS=[
-  {k:"hf",    emoji:"🔝", name:"Hub First",       pts:"+20",  desc:"Lead every guess with the shared word."},
-  {k:"hm",    emoji:"↔️", name:"Hub Middle",      pts:"+20",  desc:"Place the shared word second in every guess."},
-  {k:"bf",    emoji:"🔵", name:"Blue First",      pts:"+5",   desc:"Solve the blue group first."},
-  {k:"pf",    emoji:"🟣", name:"Purple First",    pts:"+15",  desc:"Solve the purple group first."},
-  {k:"rr",    emoji:"🌈", name:"Reverse Rainbow", pts:"+30",  desc:"Solve purple → blue → green → yellow."},
-  {k:"rw",    emoji:"🏳️‍🌈", name:"Rainbow",         pts:"",     desc:"Solve yellow → green → blue → purple."},
-  {k:"gr",    emoji:"🎾", name:"Grellow",         pts:"",     desc:"Solve purple → blue → yellow → green."},
-  {k:"gu",    emoji:"🦚", name:"Grue",            pts:"",     desc:"Solve purple → green → blue → yellow."},
-  {k:"gd",    emoji:"😤", name:"God Damnit!",     pts:"",     desc:"A perfect run, but green got swapped with yellow or blue."},
-  {k:"db",    emoji:"🌙", name:"The Day Before",   pts:"",     desc:"Played the day's puzzle between midnight and 1 am."},
-  {k:"fast",  emoji:"⚡", name:"Sub-90s",         pts:"+30",  desc:"Finish in under 90 seconds."},
-  {k:"p",     emoji:"💯", name:"Perfect Game",    pts:"",     desc:"Win with no mistakes."},
-  {k:"gold",  emoji:"🥇", name:"Gold Plaque",     pts:"",     desc:"A perfect board in under 90 seconds."},
-  {k:"silver",emoji:"🥈", name:"Silver Plaque",   pts:"",     desc:"A perfect board in under 120 seconds."},
-  {k:"rb",    emoji:"💀", name:"Rule Breaker",    pts:"−100", desc:"Put the shared word last in every guess."}
-];
-function stat(cls,b,label){ return "<div class='hstat "+cls+"'><b>"+b+"</b><span>"+label+"</span></div>"; }
-function render(){
-  const h=loadHistory();
-  CARDS=loadCards();
-  const keys=Object.keys(h).sort().reverse();   /* most recent first */
-  const sumEl=document.getElementById("summary"),
-        achEl=document.getElementById("achievements"),
-        listEl=document.getElementById("histList");
-  if(!keys.length){
-    sumEl.innerHTML=""; achEl.innerHTML="";
-    listEl.innerHTML="<div class='hint' style='margin-top:14px'>No games yet. <a href='index.html'>Play today's puzzle</a> and it'll show up here.</div>";
-    return;
-  }
-  const played=keys.length;
-  const wins=keys.filter(k=>h[k].w).length;
-  const perfects=keys.filter(k=>h[k].p).length;
-  const best=Math.max(...keys.map(k=>h[k].s));
-  const {cur,max}=streaks(keys.filter(k=>h[k].rel!==0));   /* exclude only known archive replays (pre-flag entries count) */
-  /* hero streak + subtle colour-tinted squares */
-  sumEl.innerHTML=
-    "<div class='streak-hero'><div class='sh-num'>"+cur+"</div>"+
-      "<div class='sh-label'>day streak</div>"+
-      "<div class='sh-sub'>Longest streak: "+max+" · "+played+" played</div></div>"+
-    "<div class='hstats'>"+
-      stat("c0",Math.round(wins/played*100)+"%","win rate")+
-      stat("c1",wins,"win"+(wins===1?"":"s"))+
-      stat("c2",perfects,"perfect game"+(perfects===1?"":"s"))+
-      stat("c3",best,"best score")+
-    "</div>";
-  /* achievements: one emoji box each, ? when undiscovered, tooltip explains */
-  achEl.innerHTML="<div class='ach-box'><b>Achievements</b><div class='ach-grid'>"+
-    ACHS.map(a=>{
-      const cnt=keys.filter(k=>h[k][a.k]).length;
-      if(!cnt) return "<div class='achbox locked'>?</div>";   /* no tooltip on un-earned ones */
-      const ptsTxt=/^[+−-]/.test(a.pts)?" ("+a.pts+")":"";
-      const tip=a.name+ptsTxt+" — "+a.desc+" · earned ×"+cnt;
-      return "<div class='achbox' data-def=\""+esc(tip)+"\">"+a.emoji+"</div>";
-    }).join("")+
-  "</div></div>";
-  /* compact per-game rows; tap one with a saved card to view it full-size */
-  listEl.innerHTML="<div class='hint' style='margin:14px 0 2px'>Tap a day with a share card to view it.</div>"+
-  keys.map(k=>{
-    const e=h[k];
-    let scoreTxt, loss="";
-    if(e.rb) scoreTxt=e.s+" pts";
-    else if(!e.w){ scoreTxt="Out of guesses"; loss=" loss"; }
-    else scoreTxt=e.s+" pts";
-    const meta=[e.m?e.m+" mistake"+(e.m===1?"":"s"):"No mistakes"];
-    if(e.w&&e.ms!=null) meta.push(fmtTime(e.ms));
-    if(e.rel===0) meta.push("replay");   /* archive replay — doesn't count toward the streak */
-    const hasCard=!!CARDS[k];
-    if(hasCard) meta.push("<span class='hh-cardlink'>share card →</span>");
-    return "<div class='histrow"+(hasCard?" tappable":"")+"'"+(hasCard?" data-k='"+k+"'":"")+">"+
-      "<div class='hh-top'><span class='hh-date'>"+esc(fmtDate(k))+"</span><span class='hh-score"+loss+"'>"+scoreTxt+"</span></div>"+
-      "<div class='hh-meta'>"+meta.join(" · ")+"</div>"+
-    "</div>";
-  }).join("");
-}
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>4 × 3 — Your history</title>
+        <script>
+            (function () {
+                var p = location.pathname;
+                if (!/\/$/.test(p)) {
+                    if (/\.[^\/]+$/.test(p)) p = p.replace(/[^\/]*$/, "");
+                    else p += "/";
+                }
+                var b = document.createElement("base");
+                b.setAttribute("href", p);
+                document.head.appendChild(b);
+            })();
+        </script>
+        <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+        <link rel="stylesheet" href="shared.css" />
+        <script src="shared.js"></script>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <a href="index.html" style="display: block"
+                    ><img class="logo" src="fourbythreelogo.png" alt="4 × 3"
+                /></a>
+            </header>
+            <div class="card">
+                <b>Your history</b>
+                <div id="summary"></div>
+                <div id="achievements"></div>
+                <div id="histList" class="histlist"></div>
+                <div class="hint" id="privacy" style="margin-top: 18px">
+                    Saved on this device only… no data leaves your browser.
+                    Clearing site data will reset this. Viewing from another
+                    browser or device will not show this data.
+                </div>
+            </div>
+            <footer>
+                <a href="index.html">← back to the game</a> ·
+                <a href="scoring.html">scoring</a> ·
+                <a href="archive.html">past puzzles</a> ·
+                <a href="build.html">build your own</a>
+            </footer>
+        </div>
+        <div id="deftip"></div>
+        <div id="cardLightbox"><img alt="Share card" /></div>
+        <script>
+            "use strict";
+            function loadHistory() {
+                try {
+                    return JSON.parse(
+                        localStorage.getItem("x43_history") || "{}",
+                    );
+                } catch (e) {
+                    return {};
+                }
+            }
+            function loadCards() {
+                try {
+                    return JSON.parse(
+                        localStorage.getItem("x43_cards") || "{}",
+                    );
+                } catch (e) {
+                    return {};
+                }
+            }
+            let CARDS = {};
+            function fmtTime(ms) {
+                if (ms == null) return "";
+                const s = Math.round(ms / 1000);
+                return (
+                    Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0")
+                );
+            }
+            function dayNum(k) {
+                return Math.round(
+                    new Date(k + "T12:00:00").getTime() / 86400000,
+                );
+            }
+            /* streak over release-day plays only (archive replays don't count) */
+            function streaks(relKeys) {
+                if (!relKeys.length) return { cur: 0, max: 0 };
+                const nums = relKeys.map(dayNum).sort((a, b) => a - b);
+                let max = 1,
+                    run = 1;
+                for (let i = 1; i < nums.length; i++) {
+                    run = nums[i] === nums[i - 1] + 1 ? run + 1 : 1;
+                    if (run > max) max = run;
+                }
+                const today = dayNum(todayStr()),
+                    last = nums[nums.length - 1];
+                let cur = 0;
+                if (last === today || last === today - 1) {
+                    cur = 1;
+                    for (let i = nums.length - 1; i > 0; i--) {
+                        if (nums[i] === nums[i - 1] + 1) cur++;
+                        else break;
+                    }
+                }
+                return { cur, max };
+            }
+            /* every point-affecting result is an achievement; shown as a single emoji + tooltip */
+            const ACHS = [
+                {
+                    k: "hf",
+                    emoji: "🔝",
+                    name: "Hub First",
+                    pts: "+20",
+                    desc: "Lead every guess with the shared word.",
+                },
+                {
+                    k: "hm",
+                    emoji: "↔️",
+                    name: "Hub Middle",
+                    pts: "+20",
+                    desc: "Place the shared word second in every guess.",
+                },
+                {
+                    k: "bf",
+                    emoji: "🔵",
+                    name: "Blue First",
+                    pts: "+5",
+                    desc: "Solve the blue group first.",
+                },
+                {
+                    k: "pf",
+                    emoji: "🟣",
+                    name: "Purple First",
+                    pts: "+15",
+                    desc: "Solve the purple group first.",
+                },
+                {
+                    k: "rr",
+                    emoji: "🌈",
+                    name: "Reverse Rainbow",
+                    pts: "+30",
+                    desc: "Solve purple → blue → green → yellow.",
+                },
+                {
+                    k: "rw",
+                    emoji: "🏳️‍🌈",
+                    name: "Rainbow",
+                    pts: "",
+                    desc: "Solve yellow → green → blue → purple.",
+                },
+                {
+                    k: "gr",
+                    emoji: "🎾",
+                    name: "Grellow",
+                    pts: "",
+                    desc: "Solve purple → blue → yellow → green.",
+                },
+                {
+                    k: "gu",
+                    emoji: "🦚",
+                    name: "Grue",
+                    pts: "",
+                    desc: "Solve purple → green → blue → yellow.",
+                },
+                {
+                    k: "gd",
+                    emoji: "😤",
+                    name: "God Damnit!",
+                    pts: "",
+                    desc: "A perfect run, but green got swapped with yellow or blue.",
+                },
+                {
+                    k: "db",
+                    emoji: "🌙",
+                    name: "The Day Before",
+                    pts: "",
+                    desc: "Played the day's puzzle between midnight and 1 am.",
+                },
+                {
+                    k: "fast",
+                    emoji: "⚡",
+                    name: "Sub-90s",
+                    pts: "+30",
+                    desc: "Finish in under 90 seconds.",
+                },
+                {
+                    k: "p",
+                    emoji: "💯",
+                    name: "Perfect Game",
+                    pts: "",
+                    desc: "Win with no mistakes.",
+                },
+                {
+                    k: "gold",
+                    emoji: "🥇",
+                    name: "Gold Plaque",
+                    pts: "",
+                    desc: "A perfect board in under 90 seconds.",
+                },
+                {
+                    k: "silver",
+                    emoji: "🥈",
+                    name: "Silver Plaque",
+                    pts: "",
+                    desc: "A perfect board in under 120 seconds.",
+                },
+                {
+                    k: "rb",
+                    emoji: "💀",
+                    name: "Rule Breaker",
+                    pts: "−100",
+                    desc: "Put the shared word last in every guess.",
+                },
+            ];
+            function stat(cls, b, label) {
+                return (
+                    "<div class='hstat " +
+                    cls +
+                    "'><b>" +
+                    b +
+                    "</b><span>" +
+                    label +
+                    "</span></div>"
+                );
+            }
+            function render() {
+                const h = loadHistory();
+                CARDS = loadCards();
+                const keys = Object.keys(h)
+                    .sort()
+                    .reverse(); /* most recent first */
+                const sumEl = document.getElementById("summary"),
+                    achEl = document.getElementById("achievements"),
+                    listEl = document.getElementById("histList");
+                if (!keys.length) {
+                    sumEl.innerHTML = "";
+                    achEl.innerHTML = "";
+                    listEl.innerHTML =
+                        "<div class='hint' style='margin-top:14px'>No games yet. <a href='index.html'>Play today's puzzle</a> and it'll show up here.</div>";
+                    return;
+                }
+                const played = keys.length;
+                const wins = keys.filter((k) => h[k].w).length;
+                const perfects = keys.filter((k) => h[k].p).length;
+                const best = Math.max(...keys.map((k) => h[k].s));
+                const { cur, max } = streaks(
+                    keys.filter((k) => h[k].rel !== 0),
+                ); /* exclude only known archive replays (pre-flag entries count) */
+                /* hero streak + subtle colour-tinted squares */
+                sumEl.innerHTML =
+                    "<div class='streak-hero'><div class='sh-num'>" +
+                    cur +
+                    "</div>" +
+                    "<div class='sh-label'>day streak</div>" +
+                    "<div class='sh-sub'>Longest streak: " +
+                    max +
+                    " · " +
+                    played +
+                    " played</div></div>" +
+                    "<div class='hstats'>" +
+                    stat(
+                        "c0",
+                        Math.round((wins / played) * 100) + "%",
+                        "win rate",
+                    ) +
+                    stat("c1", wins, "win" + (wins === 1 ? "" : "s")) +
+                    stat(
+                        "c2",
+                        perfects,
+                        "perfect game" + (perfects === 1 ? "" : "s"),
+                    ) +
+                    stat("c3", best, "best score") +
+                    "</div>";
+                /* achievements: one emoji box each, ? when undiscovered, tooltip explains */
+                achEl.innerHTML =
+                    "<div class='ach-box'><b>Achievements</b><div class='ach-grid'>" +
+                    ACHS.map((a) => {
+                        const cnt = keys.filter((k) => h[k][a.k]).length;
+                        if (!cnt)
+                            return "<div class='achbox locked'>?</div>"; /* no tooltip on un-earned ones */
+                        const ptsTxt = /^[+−-]/.test(a.pts)
+                            ? " (" + a.pts + ")"
+                            : "";
+                        const tip =
+                            a.name +
+                            ptsTxt +
+                            " — " +
+                            a.desc +
+                            " · earned ×" +
+                            cnt;
+                        return (
+                            "<div class='achbox' data-def=\"" +
+                            esc(tip) +
+                            '">' +
+                            a.emoji +
+                            "</div>"
+                        );
+                    }).join("") +
+                    "</div></div>";
+                /* compact per-game rows; tap one with a saved card to view it full-size */
+                listEl.innerHTML =
+                    "<div class='hint' style='margin:14px 0 2px'>Tap a day with a share card to view it.</div>" +
+                    keys
+                        .map((k) => {
+                            const e = h[k];
+                            let scoreTxt,
+                                loss = "";
+                            if (e.rb) scoreTxt = e.s + " pts";
+                            else if (!e.w) {
+                                scoreTxt = "Out of guesses";
+                                loss = " loss";
+                            } else scoreTxt = e.s + " pts";
+                            const meta = [
+                                e.m
+                                    ? e.m + " mistake" + (e.m === 1 ? "" : "s")
+                                    : "No mistakes",
+                            ];
+                            if (e.w && e.ms != null) meta.push(fmtTime(e.ms));
+                            if (e.rel === 0)
+                                meta.push(
+                                    "replay",
+                                ); /* archive replay — doesn't count toward the streak */
+                            const hasCard = !!CARDS[k];
+                            if (hasCard)
+                                meta.push(
+                                    "<span class='hh-cardlink'>share card →</span>",
+                                );
+                            return (
+                                "<div class='histrow" +
+                                (hasCard ? " tappable" : "") +
+                                "'" +
+                                (hasCard ? " data-k='" + k + "'" : "") +
+                                ">" +
+                                "<div class='hh-top'><span class='hh-date'>" +
+                                esc(fmtDate(k)) +
+                                "</span><span class='hh-score" +
+                                loss +
+                                "'>" +
+                                scoreTxt +
+                                "</span></div>" +
+                                "<div class='hh-meta'>" +
+                                meta.join(" · ") +
+                                "</div>" +
+                                "</div>"
+                            );
+                        })
+                        .join("");
+            }
 
-/* share-card lightbox */
-(function(){
-  const lb=document.getElementById("cardLightbox"), img=lb.querySelector("img");
-  document.getElementById("histList").addEventListener("click",e=>{
-    const row=e.target.closest(".histrow.tappable"); if(!row) return;
-    const url=CARDS[row.dataset.k]; if(!url) return;
-    img.src=url; lb.classList.add("show");
-  });
-  lb.addEventListener("click",()=>{ lb.classList.remove("show"); img.src=""; });
-})();
+            /* share-card lightbox */
+            (function () {
+                const lb = document.getElementById("cardLightbox"),
+                    img = lb.querySelector("img");
+                document
+                    .getElementById("histList")
+                    .addEventListener("click", (e) => {
+                        const row = e.target.closest(".histrow.tappable");
+                        if (!row) return;
+                        const url = CARDS[row.dataset.k];
+                        if (!url) return;
+                        img.src = url;
+                        lb.classList.add("show");
+                    });
+                lb.addEventListener("click", () => {
+                    lb.classList.remove("show");
+                    img.src = "";
+                });
+            })();
 
-/* achievement tooltips (hover + tap), reusing the #deftip element */
-(function(){
-  const tip=document.getElementById("deftip"), ach=document.getElementById("achievements");
-  function show(el){
-    tip.textContent=el.dataset.def||""; tip.classList.add("show");
-    const r=el.getBoundingClientRect(), tw=tip.offsetWidth, th=tip.offsetHeight;
-    const left=Math.max(8,Math.min(r.left+r.width/2-tw/2, innerWidth-tw-8));
-    let top=r.top-th-8; if(top<6) top=r.bottom+8;
-    tip.style.left=left+"px"; tip.style.top=top+"px";
-  }
-  function hide(){ tip.classList.remove("show"); }
-  ach.addEventListener("mouseover",e=>{ const t=e.target.closest(".achbox[data-def]"); if(t) show(t); });
-  ach.addEventListener("mouseout",e=>{ const t=e.target.closest(".achbox[data-def]"); if(t) hide(); });
-  ach.addEventListener("click",e=>{ const t=e.target.closest(".achbox[data-def]"); if(t){ show(t); e.stopPropagation(); } });
-  document.addEventListener("click",e=>{ if(!e.target.closest(".achbox[data-def]")) hide(); });
-  window.addEventListener("scroll",hide,true);
-})();
+            /* achievement tooltips (hover + tap), reusing the #deftip element */
+            (function () {
+                const tip = document.getElementById("deftip"),
+                    ach = document.getElementById("achievements");
+                function show(el) {
+                    tip.textContent = el.dataset.def || "";
+                    tip.classList.add("show");
+                    const r = el.getBoundingClientRect(),
+                        tw = tip.offsetWidth,
+                        th = tip.offsetHeight;
+                    const left = Math.max(
+                        8,
+                        Math.min(
+                            r.left + r.width / 2 - tw / 2,
+                            innerWidth - tw - 8,
+                        ),
+                    );
+                    let top = r.top - th - 8;
+                    if (top < 6) top = r.bottom + 8;
+                    tip.style.left = left + "px";
+                    tip.style.top = top + "px";
+                }
+                function hide() {
+                    tip.classList.remove("show");
+                }
+                ach.addEventListener("mouseover", (e) => {
+                    const t = e.target.closest(".achbox[data-def]");
+                    if (t) show(t);
+                });
+                ach.addEventListener("mouseout", (e) => {
+                    const t = e.target.closest(".achbox[data-def]");
+                    if (t) hide();
+                });
+                ach.addEventListener("click", (e) => {
+                    const t = e.target.closest(".achbox[data-def]");
+                    if (t) {
+                        show(t);
+                        e.stopPropagation();
+                    }
+                });
+                document.addEventListener("click", (e) => {
+                    if (!e.target.closest(".achbox[data-def]")) hide();
+                });
+                window.addEventListener("scroll", hide, true);
+            })();
 
-render();
-</script>
-</body>
+            render();
+        </script>
+    </body>
 </html>

@@ -22,6 +22,8 @@ function reduceMotion() {
   c.toggle("a11y-nr", !!A11Y.nr);
 })();
 
+const BASE_URL = "https://hankgreen.com/fourbythree/";
+
 /* category palette: 0 blue, 1 green, 2 yellow, 3 purple. "Labeled colors" mode keeps
    these and just adds the colour's name to each solved tile (no recolouring). */
 const BASE_COLORS = ["#5b8def", "#56b870", "#e7b416", "#a06ee1"];
@@ -130,13 +132,19 @@ function esc(s) {
    folder so it loads whether the URL is /fourbythree, /fourbythree/, or
    /fourbythree/index.html (a bare "puzzles.json" would otherwise hit the root) */
 function pjURL(file) {
+  const target = file || BASE_URL + "puzzles.json";
+
+  // if it's already an absolute URL, don't prepend the local path
+  if (target.startsWith("http://") || target.startsWith("https://")) {
+    return target + (target.includes("?") ? "&" : "?") + "ts=" + Date.now();
+  }
+
   let dir = location.pathname;
   if (!/\/$/.test(dir)) {
-    if (/\.[^/]+$/.test(dir))
-      dir = dir.replace(/[^/]*$/, ""); /* strip a filename like index.html */
-    else dir += "/"; /* extensionless path = the directory */
+    if (/\.[^/]+$/.test(dir)) dir = dir.replace(/[^/]*$/, "");
+    else dir += "/";
   }
-  return dir + (file || "puzzles.json") + "?ts=" + Date.now();
+  return dir + target + "?ts=" + Date.now();
 }
 
 /* ---------- clipboard ---------- */
