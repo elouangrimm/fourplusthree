@@ -1,5 +1,7 @@
 const CACHE_NAME = "fourbythree-cache-v1";
-const ASSETS_TO_CACHE = [
+
+// Only pre-cache guaranteed, critical code assets on install
+const ESSENTIAL_ASSETS = [
   "./",
   "index.html",
   "archive.html",
@@ -8,17 +10,7 @@ const ASSETS_TO_CACHE = [
   "shared.js",
   "shared.css",
   "stats-beacon.js",
-  "fourbythreelogo.png",
-  "bluefish.jpg",
-  "greenfish.jpg",
-  "yellowfish.jpg",
-  "lightpurple.jpg",
-  "lightfish2.jpg",
-  "fishtrans.png",
   "manifest.json",
-  "favicon.svg",
-  "favicon-32.png",
-  "apple-touch-icon.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -26,7 +18,7 @@ self.addEventListener("install", (event) => {
     caches
       .open(CACHE_NAME)
       .then((cache) => {
-        return cache.addAll(ASSETS_TO_CACHE);
+        return cache.addAll(ESSENTIAL_ASSETS);
       })
       .then(() => self.skipWaiting()),
   );
@@ -70,12 +62,12 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Stale-while-revalidate for static assets
+  // Stale-while-revalidate for static assets, dynamically caching optional/image files on successful load
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request)
         .then((networkResponse) => {
-          if (networkResponse.status === 200) {
+          if (networkResponse && networkResponse.status === 200) {
             const clone = networkResponse.clone();
             caches
               .open(CACHE_NAME)
