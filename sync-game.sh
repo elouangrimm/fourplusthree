@@ -5,7 +5,7 @@ set -e
 
 # --- Configuration ---
 BASE_URL="https://hankgreen.com/fourbythree"
-BACKUP_DIR="~/Coding/fourbythree/localbackup"
+BACKUP_DIR="/home/elouan/Coding/fourbythree/localbackup"
 REMOTE_MIRROR_DIR="${BACKUP_DIR}/remote_mirror"
 
 # List of all files making up the game platform
