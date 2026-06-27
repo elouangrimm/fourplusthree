@@ -204,6 +204,16 @@
   .promo-banner a:focus-visible, .promo-body a:focus-visible{outline:none; border-radius:3px; box-shadow:0 0 0 2px var(--paper),0 0 0 4px #1f6feb;}
   /* bean stands with feet inside the bar, head poking out the top, on the left */
   .promo-bean{position:absolute; left:8px; bottom:2px; transform:scaleX(-1); height:86px; width:auto; margin:0;}
+  /* Maya stands the same way (not flipped — she's a photo); a touch more left room for her */
+  .promo-maya{position:absolute; left:7px; bottom:1px; height:78px; width:auto; margin:0;
+    filter:drop-shadow(0 3px 5px rgba(80,50,120,.25));}
+  /* Ask Hank Anything brand: cream → orange, orange border, brown text */
+  .promo-banner-maya{padding-left:70px; color:#5c3a22;
+    background:linear-gradient(115deg,#fdf5e1,#fbe6bd 60%,#f6cf93);
+    border-color:#eda64f;}
+  .promo-banner-maya b{color:#bf6f1e;}
+  .promo-banner-maya a{color:#bf6f1e;}
+  .promo-banner-maya a:hover{color:#8a4f12;}
   /* desktop sidebar version is hidden until there's a clear gutter to put it in */
   .promo-side{display:none;}
   @media (min-width:1200px){
@@ -218,6 +228,17 @@
     .promo-kicker{font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:#8a6fb0; font-weight:700;}
     .promo-body{font-size:13.5px; line-height:1.5; color:#3a3128; margin:5px 0 0;}
     .promo-img{display:block; width:130px; max-width:80%; margin:0 auto 4px;}
+    /* Maya stands up out of the top of the sidebar card (negative top margin lets her poke above) */
+    .promo-maya-side{display:block; width:112px; max-width:80%; margin:-75px auto 8px;
+      filter:drop-shadow(0 6px 11px rgba(80,50,120,.22));}
+    /* Ask Hank Anything brand colours for the sidebar card */
+    .promo-side-maya{color:#5c3a22;
+      background:linear-gradient(160deg,#fdf5e1,#fbe6bd 60%,#f6cf93);
+      border-color:#eda64f;}
+    .promo-side-maya .promo-kicker{color:#a9702e;}
+    .promo-side-maya .promo-body{color:#5c3a22;}
+    .promo-side-maya .promo-body b{color:#bf6f1e;}
+    .promo-side-maya .promo-body a{color:#bf6f1e;}
     .promo-apps{display:flex; gap:8px; margin-top:11px;}
     .promo-apps a{flex:1; text-align:center; text-decoration:none; font-size:13px; font-weight:700;
       color:#7d3fc4; border:1.5px solid rgba(125,63,196,.45); border-radius:999px; padding:6px 8px;}
