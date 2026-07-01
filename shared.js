@@ -12,9 +12,9 @@ function reduceMotion(){ return !!A11Y.rm; }   /* checked at animation time in i
 
 /* category palette: 0 blue, 1 green, 2 yellow, 3 purple. "Labeled colors" mode keeps
    these and just adds the colour's name to each solved tile (no recolouring). */
-const COLORS=["#5b8def","#56b870","#e7b416","#a06ee1"];
-const TINTS=["#e8effc","#e6f4ea","#fcf3d7","#f1e8fa"];
-const MIDC=["#b1c9f7","#b3dcc0","#f3da8e","#d2b9f0"];
+const COLORS=["#5686e3","#52af6a","#dbab15","#9868d6"];
+const TINTS=["#dce3ef","#dae8de","#efe7cc","#e5dcee"];
+const MIDC=["#a8bfeb","#aad1b6","#e7cf87","#c8b0e4"];
 const COLOR_NAMES=["blue","green","yellow","purple"];
 
 /* scoring point values — change them here and every page follows */

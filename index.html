@@ -46,7 +46,7 @@
       {id:"ff",bc:"",sc:"",
        banner:`<img class="promo-bean" src="hankbeantrans.png" alt="" loading="lazy"> Need a cozy tool to help you take back control from social media apps? My app <b>Focus Friend</b> is zero cost and ad-free!! <a href="https://apps.apple.com/us/app/focus-friend-by-hank-green/id6742278016" target="_blank" rel="noopener">iPhone</a> · <a href="https://play.google.com/store/apps/details?id=com.underthing.focus.friend" target="_blank" rel="noopener">Android</a>`,
        side:`<img class="promo-img" src="focusfriendtrans.png" alt="Focus Friend" loading="lazy"><div class="promo-kicker">From Hank</div><p class="promo-body">Need a cozy tool to help you take back control from social media apps? My app <b>Focus Friend</b> is zero cost and ad-free!!</p><div class="promo-apps"><a href="https://apps.apple.com/us/app/focus-friend-by-hank-green/id6742278016" target="_blank" rel="noopener">iPhone</a><a href="https://play.google.com/store/apps/details?id=com.underthing.focus.friend" target="_blank" rel="noopener">Android</a></div>`},
-      {id:"humans",bc:"",sc:"",
+      {id:"humans",bc:"promo-banner-plain",sc:"",
        banner:`I got a text from a friend this week calling the episode of “Humans” with Helen Hunt “Truly some of your best work” so… maybe you want to <a href="https://www.humanswithhank.com/" target="_blank" rel="noopener">check that out</a>.`,
        side:`<div class="promo-kicker">From Hank</div><p class="promo-body">I got a text from a friend this week calling the episode of “Humans” with Helen Hunt “Truly some of your best work” so… maybe you want to <a href="https://www.humanswithhank.com/" target="_blank" rel="noopener">check that out</a>.</p>`}
     ];
@@ -705,6 +705,48 @@ const DEFS={
     "A Real Prize":{GEM:"A gem of a person, a real treasure.",KEEPER:"So good you'd want to hang onto it.",CATCH:"A catch...an especially desirable person to date or marry."},
     "Fasteners":{LATCH:"A lever that holds a door or gate shut.",BOLT:"A metal bar you slide to lock a door.",CATCH:"A small fastener that keeps a door or lid closed."},
     "Haul":{BOUNTY:"A generous, plentiful supply or reward.",YIELD:"The total amount produced or gathered.",CATCH:"The day's catch...the fish hauled in."}
+  },
+  PLANE:{
+    "Geometry Stuff":{POINT:"A point: a single position in space, with no size of its own.",VECTOR:"A vector: a quantity with both magnitude and direction.",PLANE:"A plane: a flat surface that extends forever in two dimensions."},
+    "Air ___":{JORDAN:"Air Jordan: Nike's legendary Michael Jordan sneaker line.",BUD:"Air Bud: the family movie about a golden retriever who can hoop.",PLANE:"Airplane: a powered, fixed-wing aircraft (and a very quotable 1980 comedy)."},
+    "In a Wood Shop":{ROUTER:"A router: a tool that cuts grooves and decorative edges in wood.",CLAMP:"A clamp: a device for strongly holding two things together.",PLANE:"A plane: a blade tool that shaves thin curls off wood to flatten it."},
+    "Things With Engines":{GOOGLE:"Google famously has a search engine 😅.",TRAINS:"Trains: hauled along by a locomotive, the engine up front.",PLANE:"A plane: a jet is pushed through the sky by its engines."}
+  },
+  TOP:{
+    "They Spin":{YOYO:"A yo-yo spins down and back up its string.",CAROUSEL:"A merry-go-round that spins its riders in a circle. Also... that Mad Men scene!",TOP:"A toy that spins balanced on a point."},
+    "Upper-Body Garments":{BLOUSE:"A loose, often dressier upper-body garment.",TANK:"A tank top: sleeveless and casual. Named for when they were part of swimwear, back when swimming pools were called \"swim tanks.\"",TOP:"A 'top' is anything you wear up top, but usually reserved for women's clothing."},
+    "The Highest Point":{PEAK:"The pointed top of a mountain.",SUMMIT:"The highest point you can climb to.",TOP:"The very topmost point of anything."},
+    "Bedroom Roles":{BOTTOM:"The partner who takes the more receptive or submissive role.",SWITCH:"Someone happy to play either role, depending on the mood.",TOP:"The partner who takes the more dominant or active role."}
+  },
+  CAN:{
+    "Food Containers":{JAR:"A jar: a wide-mouthed glass container for jam, pickles, and the like.",TIN:"A tin: a sealed metal food container (British for a can).",CAN:"A can: a sealed metal container for food or drink."},
+    "To Fire From a Job":{AXE:"To get the axe.",BOOT:"To get the boot.",CAN:"To get canned."},
+    "Slang for Prison":{CLINK:"The clink: old slang for jail, after a London prison.",PEN:"The pen: short for penitentiary, not the writing kind.",CAN:"The can: slang for jail, as in 'doing time in the can.'"},
+    "Double It For Dancing":{CHA:"Cha-cha: a flirty Latin ballroom dance.",GO:"Go-go dancers are often hired by clubs to set the mood for dancing.",CAN:"Can-can: the high-kicking French music-hall dance."}
+  },
+  FRY:{
+    "Baby Animals":{JOEY:"A baby kangaroo.",CUB:"A baby bear, lion, or fox.",FRY:"Freshly hatched baby fish."},
+    "Units of a Potato Treat":{TOT:"One bite-sized tater tot.",CHIP:"A crispy fried potato piece (a British 'chip' is a fry).",FRY:"A single French fry."},
+    "Things You Can Do to a Potato":{BOIL:"Cooking a potato in boiling water.",ROAST:"Potatoes in the oven.",FRY:"Fried in hot oil."},
+    "French ___":{PRESS:"French press, a coffee brewing technique.",TOAST:"A piece of bread soaked in beaten egg and then cooked on a hot pan, usually served with sugar and syrup.",FRY:"A long-cut piece of potato deep fried in oil."}
+  },
+  STOCK:{
+    "Investments":{GOLD:"A precious metal investors buy as a safe haven in uncertain times.",BONDS:"Loans to a government or company that pay interest.",STOCK:"A share of ownership in a company."},
+    "Savory Liquids":{GRAVY:"A savory sauce made from meat drippings.",JUS:"The natural meat juices served with a roast (as in au jus).",STOCK:"A savory liquid simmered from bones and vegetables (the base of most soups)."},
+    "Parts of a Musket":{LOCK:"The firing mechanism of an old gun.",BARREL:"The tube the bullet travels down.",STOCK:"The wooden shoulder piece — \"lock, stock, and barrel\" is also a saying that means \"all of it,\" or \"everything.\""},
+    "Kinds of Car Racing":{DRAG:"Straight-line acceleration over a short distance.",RALLY:"Racing on closed roads and rough terrain, stage by stage.",STOCK:"Stock car racing uses cars designed to look like standard sedans (NASCAR is the most famous)."}
+  },
+  SHADE:{
+    "A Gradation of Color":{TINT:"Officially, a color lightened by adding white. In everyday use, more \"a variation.\"",HUE:"A pure color.",SHADE:"In color theory, a shade is a color darkened by adding black. In everyday use, \"a variation.\""},
+    "Window Coverings":{BLIND:"Tiltable slats that control the light.",DRAPE:"A heavy fabric curtain.",SHADE:"A pull-down screen for a window."},
+    "A Petty Diss":{DIG:"A pointed little insult.",JAB:"A quick verbal poke.",SHADE:"Subtle disrespect: to 'throw shade.'"},
+    "Ghostly Being":{PHANTOM:"A ghost or apparition.",SPECTER:"A haunting spirit.",SHADE:"An old literary word for the ghost of the dead."}
+  },
+  AMERICA:{
+    "Captain ___":{MORGAN:"He appears to be a pirate who makes rum.",HOOK:"Captain Hook, Peter Pan's pirate nemesis.",AMERICA:"Marvel's star-spangled super-soldier."},
+    "Miss ___":{"PAC-MAN":"Like Pac-Man... but Miss.",PIGGY:"The diva of the Muppets.",AMERICA:"The long-running U.S. beauty pageant."},
+    "Bands Named for Places":{BOSTON:"Boston: '70s rockers behind 'More Than a Feeling.'",KANSAS:"Kansas: 'Carry On Wayward Son' and 'Dust in the Wind.'",AMERICA:"America: the American band behind 'A Horse with No Name' was actually formed in London!"},
+    "Things That Have States":{MATTER:"Matter has states: solid, liquid, gas, and plasma.",MIND:"A state of mind is your mental condition in the moment.",AMERICA:"In the U.S., the United States of America is often referred to simply as \"America.\""}
   }
 };
 /* post-game easter egg: tap the hub to press it in and burst out emojis */
@@ -856,7 +898,12 @@ function renderSolvedList(){
   const el=document.getElementById("solvedList");
   el.innerHTML="";
   const defsOn = DEFS[special];   /* hover-definitions on revealed words (hub-known rows), no wait for game end */
-  solvedIdx.forEach(ci=>{
+  /* once the game is over, ALWAYS reveal all four categories (solved order first, then
+     any the player never got) so a loss can never hide the category you missed */
+  const order = over
+    ? [...solvedIdx, ...cats.map((_,i)=>i).filter(i=>!solvedIdx.includes(i))]
+    : solvedIdx;
+  order.forEach(ci=>{
     const c=cats[ci];
     const div=document.createElement("div");
     div.className="scat";

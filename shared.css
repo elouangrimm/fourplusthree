@@ -1,5 +1,5 @@
   :root{
-    --c0:#5b8def; --c1:#56b870; --c2:#e7b416; --c3:#a06ee1;
+    --c0:#5686e3; --c1:#52af6a; --c2:#dbab15; --c3:#9868d6;
     --ink:#2b2620; --paper:#faf7f1; --card:#ffffff; --line:#d8d2c6;
     --bad:#d05b5b; --good:#56b870;
   }
@@ -208,6 +208,8 @@
   .promo-maya{position:absolute; left:7px; bottom:1px; height:78px; width:auto; margin:0;
     filter:drop-shadow(0 3px 5px rgba(80,50,120,.25));}
   /* Ask Hank Anything brand: cream → orange, orange border, brown text */
+  /* text-only ads (no standing figure) shouldn't reserve the left image gutter */
+  .promo-banner-plain{padding-left:16px;}
   .promo-banner-maya{padding-left:70px; color:#5c3a22;
     background:linear-gradient(115deg,#fdf5e1,#fbe6bd 60%,#f6cf93);
     border-color:#eda64f;}
