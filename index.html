@@ -41,21 +41,51 @@
   (function(){
     var ADS=[
       {id:"aha",bc:"promo-banner-maya",sc:"promo-side-maya",
-       banner:`<img class="promo-maya" src="maya.png" alt="Maya Higa" loading="lazy"> Maya Higa is our most recent guest on <b><a href="https://www.youtube.com/watch?v=39KyWSyGfjY" target="_blank" rel="noopener">Ask Hank Anything!</a></b> We talk quite a lot about fish farts, which are surprisingly complex!`,
-       side:`<img class="promo-maya-side" src="maya.png" alt="Maya Higa" loading="lazy"><div class="promo-kicker">From Hank</div><p class="promo-body">Maya Higa is our most recent guest on <b><a href="https://www.youtube.com/watch?v=39KyWSyGfjY" target="_blank" rel="noopener">Ask Hank Anything!</a></b> We talk quite a lot about fish farts, which are surprisingly complex!</p>`},
+       banner:`<img class="promo-maya" src="maya.png" alt="Maya Higa"> Maya Higa is our most recent guest on <b><a href="https://www.youtube.com/watch?v=39KyWSyGfjY" target="_blank" rel="noopener">Ask Hank Anything!</a></b> We talk quite a lot about fish farts, which are surprisingly complex!`,
+       side:`<img class="promo-maya-side" src="maya.png" alt="Maya Higa"><div class="promo-kicker">From Hank</div><p class="promo-body">Maya Higa is our most recent guest on <b><a href="https://www.youtube.com/watch?v=39KyWSyGfjY" target="_blank" rel="noopener">Ask Hank Anything!</a></b> We talk quite a lot about fish farts, which are surprisingly complex!</p>`},
       {id:"ff",bc:"",sc:"",
-       banner:`<img class="promo-bean" src="hankbeantrans.png" alt="" loading="lazy"> Need a cozy tool to help you take back control from social media apps? My app <b>Focus Friend</b> is zero cost and ad-free!! <a href="https://apps.apple.com/us/app/focus-friend-by-hank-green/id6742278016" target="_blank" rel="noopener">iPhone</a> · <a href="https://play.google.com/store/apps/details?id=com.underthing.focus.friend" target="_blank" rel="noopener">Android</a>`,
-       side:`<img class="promo-img" src="focusfriendtrans.png" alt="Focus Friend" loading="lazy"><div class="promo-kicker">From Hank</div><p class="promo-body">Need a cozy tool to help you take back control from social media apps? My app <b>Focus Friend</b> is zero cost and ad-free!!</p><div class="promo-apps"><a href="https://apps.apple.com/us/app/focus-friend-by-hank-green/id6742278016" target="_blank" rel="noopener">iPhone</a><a href="https://play.google.com/store/apps/details?id=com.underthing.focus.friend" target="_blank" rel="noopener">Android</a></div>`},
+       banner:`<img class="promo-bean" src="hankbeantrans.png" alt=""> Need a cozy tool to help you take back control from social media apps? My app <b>Focus Friend</b> is zero cost and ad-free!! <a href="https://apps.apple.com/us/app/focus-friend-by-hank-green/id6742278016" target="_blank" rel="noopener">iPhone</a> · <a href="https://play.google.com/store/apps/details?id=com.underthing.focus.friend" target="_blank" rel="noopener">Android</a>`,
+       side:`<img class="promo-img" src="focusfriendtrans.png" alt="Focus Friend"><div class="promo-kicker">From Hank</div><p class="promo-body">Need a cozy tool to help you take back control from social media apps? My app <b>Focus Friend</b> is zero cost and ad-free!!</p><div class="promo-apps"><a href="https://apps.apple.com/us/app/focus-friend-by-hank-green/id6742278016" target="_blank" rel="noopener">iPhone</a><a href="https://play.google.com/store/apps/details?id=com.underthing.focus.friend" target="_blank" rel="noopener">Android</a></div>`},
       {id:"humans",bc:"promo-banner-plain",sc:"",
        banner:`I got a text from a friend this week calling the episode of “Humans” with Helen Hunt “Truly some of your best work” so… maybe you want to <a href="https://www.humanswithhank.com/" target="_blank" rel="noopener">check that out</a>.`,
-       side:`<div class="promo-kicker">From Hank</div><p class="promo-body">I got a text from a friend this week calling the episode of “Humans” with Helen Hunt “Truly some of your best work” so… maybe you want to <a href="https://www.humanswithhank.com/" target="_blank" rel="noopener">check that out</a>.</p>`}
+       side:`<div class="promo-kicker">From Hank</div><p class="promo-body">I got a text from a friend this week calling the episode of “Humans” with Helen Hunt “Truly some of your best work” so… maybe you want to <a href="https://www.humanswithhank.com/" target="_blank" rel="noopener">check that out</a>.</p>`},
+      {id:"swk",bc:"promo-banner-swk",sc:"promo-side-swk",socal:true,
+       banner:`<img class="promo-poster" src="SWK2.png" alt="Something Worth Knowing"> It seems that you are in SoCal. FYI, Complexly is putting on a weird and special event featuring me, <b>Simone Giertz</b>, <b>Mark Rober</b>, and more! September 16 - <a href="https://complexly.org/somethingworthknowing/" target="_blank" rel="noopener">Something Worth Knowing</a>.`,
+       side:`<img class="promo-swk-side" src="SWK2.png" alt="Something Worth Knowing"><div class="promo-kicker">Southern California</div><p class="promo-body">It seems that you are in SoCal. FYI, Complexly is putting on a weird and special event featuring me, <b>Simone Giertz</b>, <b>Mark Rober</b>, and more! September 16 - <a href="https://complexly.org/somethingworthknowing/" target="_blank" rel="noopener">Something Worth Knowing</a>.</p>`}
     ];
-    var last=""; try{ last=localStorage.getItem("x43_lastad")||""; }catch(e){}
-    var pool=ADS.filter(function(a){ return a.id!==last; }); if(!pool.length) pool=ADS;
-    var ad=pool[Math.floor(Math.random()*pool.length)];
-    try{ localStorage.setItem("x43_lastad",ad.id); }catch(e){}
-    var b=document.querySelector(".promo-banner"); if(b){ b.className="promo-banner"+(ad.bc?" "+ad.bc:""); b.innerHTML=ad.banner; }
-    var s=document.querySelector(".promo-side"); if(s){ s.className="promo-side"+(ad.sc?" "+ad.sc:""); s.innerHTML=ad.side; }
+    var byId={}; ADS.forEach(function(a){ byId[a.id]=a; });
+    function LS(k){ try{return localStorage.getItem(k);}catch(e){return null;} }
+    function SET(k,v){ try{localStorage.setItem(k,v);}catch(e){} }
+    function render(a){
+      var b=document.querySelector(".promo-banner"); if(b){ b.className="promo-banner"+(a.bc?" "+a.bc:""); b.innerHTML=a.banner; }
+      var s=document.querySelector(".promo-side");   if(s){ s.className="promo-side"+(a.sc?" "+a.sc:""); s.innerHTML=a.side; }
+    }
+    /* the SoCal event ad only enters the pool for visitors in Southern California */
+    function poolIds(socal){ return ADS.filter(function(a){ return socal || !a.socal; }).map(function(a){ return a.id; }); }
+    function pick(socal){
+      var last=LS("x43_lastad")||"";
+      var ids=poolIds(socal).filter(function(x){ return x!==last; });
+      if(!ids.length) ids=poolIds(socal);
+      return ids[Math.floor(Math.random()*ids.length)];
+    }
+    function show(id){ SET("x43_lastad",id); render(byId[id]); }
+    function decide(socal){
+      /* SoCal: show the event ad the very first time, then let it rotate like the rest */
+      if(socal && LS("x43_swk_seen")!=="1"){ SET("x43_swk_seen","1"); show("swk"); }
+      else show(pick(socal));
+    }
+    /* preview override: ?socal=1 forces the SoCal ad, ?socal=0 forces the normal rotation */
+    var forced=null;
+    try{ var q=new URLSearchParams(location.search); if(q.has("socal")) forced=(q.get("socal")!=="0"); }catch(e){}
+    if(forced!==null){ if(forced) show("swk"); else show(pick(false)); return; }
+    var cached=LS("x43_socal");                 /* "1" | "0" | null */
+    if(cached!==null){ decide(cached==="1"); }  /* returning visitor: instant, no flash */
+    else{                                       /* first visit: wait for geo so SoCal sees the event ad first */
+      var done=false;
+      var finish=function(socal,persist){ if(done)return; done=true; if(persist) SET("x43_socal", socal?"1":"0"); decide(socal); };
+      fetch("/api/geo").then(function(r){ return r.json(); }).then(function(j){ finish(!!(j&&j.socal), true); }).catch(function(){ finish(false,false); });
+      setTimeout(function(){ finish(false,false); }, 1500);   /* fallback if geo is slow/unreachable */
+    }
   })();
   </script>
 
@@ -1677,6 +1707,36 @@ function copyFeedback(){
 
 
 /* ---------- stats ---------- */
+/* Replay the guess log to recover per-category signals for telemetry. Derived from
+   `guesses` (which is saved/restored), NOT from solvedIdx — endGame back-fills
+   solvedIdx with never-solved categories on a loss, which would corrupt the order.
+   Returns {c:[m0,m1,m2,m3], so:"3102"}: mistakes attributed per color (a mistake
+   counts toward the one category the guess was clearly aiming at — the unique
+   unsolved category with the most of its own words in the guess; ties are left
+   unattributed), and the order categories were actually solved. */
+function catTelemetry(){
+  const c=[0,0,0,0], so=[], done=new Set();
+  try{
+    for(const sel of guesses){
+      let hit=-1;
+      cats.forEach((cat,i)=>{
+        if(done.has(i)) return;
+        const full=[special,...cat.words];
+        if(sel.filter(w=>full.includes(w)).length===3&&sel.includes(special)) hit=i;
+      });
+      if(hit>=0){ done.add(hit); so.push(hit); continue; }
+      let best=-1,bestN=0,tie=false;
+      cats.forEach((cat,i)=>{
+        if(done.has(i)) return;
+        const n=sel.filter(w=>cat.words.includes(w)).length;
+        if(n>bestN){ best=i; bestN=n; tie=false; }
+        else if(n===bestN&&n>0) tie=true;
+      });
+      if(best>=0&&!tie) c[best]++;
+    }
+  }catch(e){}
+  return {c, so:so.join("")};
+}
 /* per-puzzle history for this browser, keyed by the puzzle's date (daily or archive
    replay). Beta/preview runs have no date and aren't recorded. Read by history.html. */
 function recordHistory(){
@@ -1700,9 +1760,10 @@ function recordHistory(){
   /* anonymous, fire-and-forget telemetry to the stats Worker (no PII) */
   try{
     if(window.x43beacon){
-      const cs2=calcScore();
+      const cs2=calcScore(), ct=catTelemetry();
       x43beacon({p:dailyKey, rel:(dailyKey===todayStr())?1:0, w:cs2.won?1:0,
-        m:mistakes, s:cs2.score, ms:solveMs, st:streakWithToday(), ad:adClicked?1:0});
+        m:mistakes, s:cs2.score, ms:solveMs, st:streakWithToday(), ad:adClicked?1:0,
+        c:ct.c, so:ct.so});
     }
   }catch(e){}
   /* cache a COMPACT preview for the history lightbox — a downscaled JPEG, NOT the full

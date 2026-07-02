@@ -1,5 +1,5 @@
   :root{
-    --c0:#5686e3; --c1:#52af6a; --c2:#dbab15; --c3:#9868d6;
+    --c0:#5b8def; --c1:#56b870; --c2:#e7b416; --c3:#a06ee1;
     --ink:#2b2620; --paper:#faf7f1; --card:#ffffff; --line:#d8d2c6;
     --bad:#d05b5b; --good:#56b870;
   }
@@ -70,9 +70,9 @@
   .tile:focus-visible .tin{box-shadow:0 0 0 2px #fff,0 0 0 4px #1f6feb,0 0 0 6px #fff !important; z-index:2;}
   /* idle tiles breathe slowly through faint versions of the four game colors */
   @keyframes idledrift{
-    0%{background-color:#fafcff;} 25%{background-color:#f9fdfa;}
-    50%{background-color:#fffdf6;} 75%{background-color:#fcfaff;}
-    100%{background-color:#fafcff;}
+    0%{background-color:#f8fafe;} 25%{background-color:#f8fcf9;}
+    50%{background-color:#fefcf5;} 75%{background-color:#fbf9fe;}
+    100%{background-color:#f8fafe;}
   }
   .tin.idle{animation:idledrift 16s linear infinite;}
   .tile.lock .tin{cursor:default;}
@@ -210,6 +210,12 @@
   /* Ask Hank Anything brand: cream → orange, orange border, brown text */
   /* text-only ads (no standing figure) shouldn't reserve the left image gutter */
   .promo-banner-plain{padding-left:16px;}
+  /* Something Worth Knowing (SoCal event) — poster colour scheme: indigo/red-orange, gold, cream */
+  .promo-poster{position:absolute; left:9px; top:50%; transform:translateY(-50%); width:110px; height:auto; border-radius:6px;}
+  .promo-banner-swk{padding-left:134px; color:#f3ecdd;
+    background:linear-gradient(120deg,#9c3b2c,#3a2f79 42%,#2b2c74); border-color:#f2c34e;}
+  .promo-banner-swk a{color:#f7c948;}
+  .promo-banner-swk a:hover{color:#ffe08a;}
   .promo-banner-maya{padding-left:70px; color:#5c3a22;
     background:linear-gradient(115deg,#fdf5e1,#fbe6bd 60%,#f6cf93);
     border-color:#eda64f;}
@@ -241,6 +247,15 @@
     .promo-side-maya .promo-body{color:#5c3a22;}
     .promo-side-maya .promo-body b{color:#bf6f1e;}
     .promo-side-maya .promo-body a{color:#bf6f1e;}
+    /* Something Worth Knowing (SoCal event) sidebar */
+    .promo-swk-side{display:block; width:100%; max-width:186px; height:auto; margin:0 auto 8px;
+      border-radius:8px;}
+    .promo-side-swk{color:#f3ecdd;
+      background:linear-gradient(160deg,#9c3b2c,#3a2f79 42%,#2b2c74); border-color:#f2c34e;}
+    .promo-side-swk .promo-kicker{color:#f7c948;}
+    .promo-side-swk .promo-body{color:#f3ecdd;}
+    .promo-side-swk .promo-body a{color:#f7c948;}
+    .promo-side-swk .promo-body a:hover{color:#ffe08a;}
     .promo-apps{display:flex; gap:8px; margin-top:11px;}
     .promo-apps a{flex:1; text-align:center; text-decoration:none; font-size:13px; font-weight:700;
       color:#7d3fc4; border:1.5px solid rgba(125,63,196,.45); border-radius:999px; padding:6px 8px;}
