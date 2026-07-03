@@ -4,7 +4,11 @@
     --bad:#d05b5b; --good:#56b870;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-  body{margin:0; background:var(--paper); color:var(--ink);
+  body{margin:0; color:var(--ink);
+    /* very slight warm fade + faint SVG paper-grain noise on top */
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E") fixed,
+      var(--paper) linear-gradient(180deg,#fdfbf6 0%,var(--paper) 45%,#f5efe3 100%) fixed;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
   .wrap{max-width:560px; margin:0 auto; padding:20px 16px 60px; position:relative;}
   /* subtle current-streak note tucked into the top-right, next to the logo */
@@ -89,6 +93,8 @@
   .mist{text-align:center; margin-top:12px; font-size:14px; color:#7a7264;}
   .mist i{display:inline-block; width:11px; height:11px; border-radius:50%; background:var(--bad); margin:0 3px;}
   .mist i.spent{background:#ddd5c7;}
+  .timer{display:none; text-align:center; margin-top:6px; font-size:14px; color:#7a7264; font-variant-numeric:tabular-nums;}
+  html.a11y-st .timer{display:block;}
   .solvedlist{margin-top:10px;}
   .scat{border-radius:10px; padding:5px 12px; margin:5px 0; text-align:center;
     display:flex; align-items:baseline; justify-content:center; gap:8px; flex-wrap:wrap;}
@@ -157,6 +163,7 @@
   .fb .stars button{font-size:24px; background:none; border:none; cursor:pointer; filter:grayscale(1); padding:2px;}
   .fb .stars button.on{filter:none;}
   .fb textarea{width:100%; min-height:70px; border:1.5px solid var(--line); border-radius:8px; padding:8px; font-size:14px; font-family:inherit;}
+  .fb input[type=text]{width:100%; border:1.5px solid var(--line); border-radius:8px; padding:8px; font-size:14px; font-family:inherit; box-sizing:border-box;}
   .yn{display:flex; gap:8px; margin:4px 0 10px;}
   .yn button{padding:6px 16px; border-radius:999px; border:1.5px solid var(--ink); background:transparent; cursor:pointer; font-weight:600; color:var(--ink);}
   .yn button.on{background:var(--ink); color:var(--paper);}
@@ -263,6 +270,21 @@
     .promo-apps a:focus-visible{outline:none; box-shadow:0 0 0 2px var(--paper),0 0 0 4px #1f6feb;}
   }
   /* ---------- score tally (counter + icon badges in the result modal) ---------- */
+  /* streak-milestone banner: a gold bar across the top of the results card */
+  .mstreak{margin:-4px 0 14px; padding:11px 12px 12px; text-align:center; border-radius:12px;
+    font-weight:800; font-size:19px; letter-spacing:.06em; color:#5a4404;
+    background:linear-gradient(100deg,#f6d365 0%,#fde9a8 28%,#f3c94f 55%,#fbe08a 82%,#f6d365 100%);
+    background-size:220% 100%; animation:mstreak-shimmer 3.2s linear infinite;
+    box-shadow:0 2px 10px rgba(212,160,23,.35), inset 0 0 0 1.5px rgba(255,255,255,.55);}
+  .mstreak span{display:block; font-size:12.5px; font-weight:600; letter-spacing:.02em; margin-top:3px; color:#7a5d10;}
+  /* silver tier (streaks of 5 and 10) */
+  .mstreak.sv{color:#3d434e;
+    background:linear-gradient(100deg,#e3e7ee 0%,#f7f9fc 28%,#c3cad5 55%,#eef1f6 82%,#e3e7ee 100%);
+    background-size:220% 100%;
+    box-shadow:0 2px 10px rgba(136,143,157,.4), inset 0 0 0 1.5px rgba(255,255,255,.65);}
+  .mstreak.sv span{color:#566070;}
+  @keyframes mstreak-shimmer{from{background-position:0% 0;}to{background-position:220% 0;}}
+  @media (prefers-reduced-motion: reduce){ .mstreak{animation:none;} }
   .tally-count{font-size:54px; font-weight:800; text-align:center; color:var(--ink); line-height:1; margin:6px 0 12px;}
   .tally-icons{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; min-height:1px;}
   .tally-ico{width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-size:22px;

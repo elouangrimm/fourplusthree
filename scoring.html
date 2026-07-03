@@ -46,6 +46,7 @@ function renderScoring(){
       row("Purple First — solve the purple group first","+"+PURPLE_BONUS,"good")+
       row("Reverse Rainbow — purple → blue → green → yellow","+"+RAINBOW_BONUS,"good")+
       row("Sub-90s — finish in under 90 seconds","+"+SPEED_BONUS,"good")+
+      row("Efficient — solve in the "+MIN_CLICKS+"-click minimum (no wasted taps)","+"+CLICK_BONUS,"good")+
       row("Daily streak — for each day of your current streak","+1 / day","good")+
       row("Tap the ad — give the day's ad a click","+"+AD_BONUS,"good")+
     "</div>"+
@@ -56,6 +57,8 @@ function renderScoring(){
       note("🦚 Grue","Solve purple → green → blue → yellow")+
       note("😤 God Damnit!","A perfect run (no mistakes + Hub First) ruined only by a green↔yellow or green↔blue swap")+
       note("🌙 The Day Before","Play the day's puzzle between midnight and 1 am")+
+      note("🖲️ Click Happy","Win after "+MEGA_CLICKS+"+ clicks. Why?")+
+      note("✦ Streak milestones","A special banner — here and on your share card — the day your streak hits "+STREAK_MILESTONES.join(", ")+": silver at 5 and 10, gold from 25 up")+
     "</div>"+
 
     "<div class='scoresec'><b>Top honors</b>"+
