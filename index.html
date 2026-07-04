@@ -48,8 +48,16 @@
       var b=document.querySelector(".promo-banner"); if(b){ b.className="promo-banner"+(a.bc?" "+a.bc:""); b.innerHTML=a.banner; }
       var s=document.querySelector(".promo-side");   if(s){ s.className="promo-side"+(a.sc?" "+a.sc:""); s.innerHTML=a.side; }
     }
-    /* the SoCal event ad only enters the pool for visitors in Southern California */
-    function poolIds(socal){ return ADS.filter(function(a){ return socal || !a.socal; }).map(function(a){ return a.id; }); }
+    /* gates: SoCal-only ads need the geo flag; minPlays ads need a seasoned player */
+    function playCount(){ try{ return (JSON.parse(localStorage.getItem("x43_stats"))||{}).played||0; }catch(e){ return 0; } }
+    function poolIds(socal){
+      var n=playCount();
+      return ADS.filter(function(a){
+        if(a.socal&&!socal) return false;
+        if(a.minPlays&&n<=a.minPlays) return false;
+        return true;
+      }).map(function(a){ return a.id; });
+    }
     function pick(socal){
       var last=LS("x43_lastad")||"";
       var ids=poolIds(socal).filter(function(x){ return x!==last; });
@@ -1927,7 +1935,7 @@ function resultEmojiRows(){
 }
 function resultDescription(){
   const {won,score,ruleBreaker}=calcScore();
-  const head="4x3.fun"+(dailyKey?"\n"+fmtDate(dailyKey):"");   /* top line doubles as the share link */
+  const head="https://4x3.fun"+(dailyKey?"\n"+fmtDate(dailyKey):"");   /* top line doubles as the share link — full scheme so every app linkifies it */
   if(ruleBreaker) return head+"\n"+score+" points • RULE BREAKER 💀\n"+resultEmojiRows();
   return head+"\n"+(won?score+" points":"Out of guesses")+" • "+(mistakes?mistakes+" mistake"+(mistakes===1?"":"s"):"No mistakes")+"\n"+resultEmojiRows();
 }
