@@ -1856,14 +1856,20 @@ function flashBtn(btn,msg){ if(btn){const o=btn.textContent; btn.textContent=msg
    game URL. Some share targets drop attached text/url when an image is present, so
    the URL is also baked legibly into the card itself (see drawShareCard) as the
    screenshot fallback. No share API (e.g. most desktops) → copy the PNG to the
-   clipboard. Never downloads. */
+   clipboard. Never downloads.
+   On Apple platforms the share sheet treats an attached url/text as a SECOND item
+   next to the image — AirDrop then tries to send 2 things and fails. The URL is
+   already drawn onto the card, so there we share the file alone. */
+const APPLE_SHARE=/Mac|iPhone|iPad|iPod/.test(navigator.platform||"")||/iPhone|iPad|Macintosh/.test(navigator.userAgent||"");
 function shareImage(btn){
   try{ if(window.x43share&&dailyKey) x43share(dailyKey); }catch(e){}
   drawShareCard().toBlob(async blob=>{
     if(!blob){ flashBtn(btn,"Couldn't render"); return; }
     const file=new File([blob],"4x3-result.png",{type:"image/png"});
     if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-      try{ await navigator.share({files:[file],text:resultDescription(true),url:shareUrl(),title:"4 × 3"}); return; }
+      const payload=APPLE_SHARE?{files:[file],title:"4 × 3"}
+                               :{files:[file],text:resultDescription(true),url:shareUrl(),title:"4 × 3"};
+      try{ await navigator.share(payload); return; }
       catch(e){ if(e&&e.name==="AbortError") return; }   /* user dismissed the sheet: stop, don't fall through */
     }
     try{
