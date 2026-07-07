@@ -161,6 +161,28 @@
   .linkbox{background:#f1ece2; border-radius:8px; padding:9px 10px; font-size:12px;
     word-break:break-all; margin:6px 0; max-height:64px; overflow:auto;}
   .hint{font-size:12.5px; color:#7a7264; margin-top:8px;}
+  /* community stats — quiet, editorial, rule-lined (NYT-ish) */
+  .cstats{padding:18px 18px 14px;}
+  .cs-kicker{font-size:11.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--ink); border-bottom:2px solid var(--ink); padding-bottom:7px;}
+  .cs-sub{font-size:13px; color:#7a7264; margin:8px 0 2px; font-variant-numeric:tabular-nums;}
+  .cs-note{font-size:14px; color:#7a7264; margin:12px 0 4px; line-height:1.55;}
+  .cs-diff{display:flex; align-items:center; gap:10px; margin:14px 0 2px; font-size:14px;}
+  .cs-diff b{font-weight:700;}
+  .cs-hint{font-size:12px; color:#a39a89; font-variant-numeric:tabular-nums;}
+  .cs-meter{display:inline-flex; gap:3px;}
+  .cs-meter i{width:20px; height:8px; border-radius:2px; background:#eee7d9;}
+  .cs-meter i.on{background:var(--ink);}
+  .cs-label{font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#8f8574;}
+  .cs-sec{margin-top:16px; padding-top:12px; border-top:1px solid #eee7d9;}
+  .cs-sec .cs-label{display:block; margin-bottom:8px;}
+  .cs-row{display:flex; align-items:center; gap:10px; margin:6px 0; font-size:13.5px;}
+  .cs-name{flex:0 0 96px; text-align:right; color:#5d564a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .cs-bar{flex:1; height:13px; background:#f4efe5; border-radius:3px; overflow:hidden;}
+  .cs-bar i{display:block; height:100%; border-radius:3px; min-width:2px;}
+  .cs-pct{flex:0 0 38px; font-weight:600; font-variant-numeric:tabular-nums; text-align:right;}
+  .cs-you{font-size:10px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+    background:var(--ink); color:var(--paper); border-radius:4px; padding:2.5px 6px;}
   /* feedback */
   .fb .stars{display:flex; gap:6px; margin:4px 0 10px;}
   .fb .stars button{font-size:24px; background:none; border:none; cursor:pointer; filter:grayscale(1); padding:2px;}
@@ -196,7 +218,10 @@
   .srow .v{font-weight:700; white-space:nowrap;}
   .srow .v.good{color:#3b8f57;} .srow .v.bad{color:var(--bad);}
   .srow .sd{color:#7a7264; font-size:13px; text-align:right; max-width:56%;}
-  .scat .def{cursor:help;}
+  .scat .def{cursor:help;
+    text-decoration:underline dashed rgba(43,38,32,.4);
+    text-decoration-thickness:1px; text-underline-offset:3px;}
+  .scat .hub.def{text-decoration-color:rgba(184,134,11,.55);} /* hub keeps its gold, softly */
   #deftip{position:fixed; z-index:130; max-width:240px; background:var(--ink); color:var(--paper);
     font-size:12.5px; line-height:1.4; padding:8px 11px; border-radius:9px;
     box-shadow:0 6px 18px rgba(43,38,32,.3); opacity:0; transform:translateY(4px);

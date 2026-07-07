@@ -79,7 +79,7 @@
     else{                                       /* first visit: wait for geo so SoCal sees the event ad first */
       var done=false;
       var finish=function(socal,persist){ if(done)return; done=true; if(persist) SET("x43_socal", socal?"1":"0"); decide(socal); };
-      fetch("/api/geo").then(function(r){ return r.json(); }).then(function(j){ finish(!!(j&&j.socal), true); }).catch(function(){ finish(false,false); });
+      fetch("https://fourbythree-stats.hankmt.workers.dev/geo").then(function(r){ return r.json(); }).then(function(j){ finish(!!(j&&j.socal), true); }).catch(function(){ finish(false,false); });
       setTimeout(function(){ finish(false,false); }, 1500);   /* fallback if geo is slow/unreachable */
     }
   })();
@@ -105,6 +105,7 @@
       </div>
       <div id="result" style="display:none" class="result"></div>
     </div>
+    <div id="commStats" style="display:none" class="card cstats" aria-label="How everyone did"></div>
     <div id="fbCard" style="display:none" class="card fb">
       <b>🧪 Beta feedback for the creator</b>
       <label style="display:block;margin-top:10px;font-size:14px">How hard was it? (1 = trivial, 5 = brutal)</label>
@@ -414,6 +415,7 @@ function startGame(){
   document.getElementById("boardWrap").style.display="";
   document.getElementById("result").style.display="none";
   document.getElementById("fbCard").style.display="none";
+  const cse=document.getElementById("commStats"); cse.style.display="none"; cse.innerHTML=""; commStatsShown=false;
   document.getElementById("solvedList").innerHTML="";
   const db=document.getElementById("deselBtn");
   db.style.display=""; db.style.opacity="";
@@ -812,7 +814,7 @@ const DEFS={
   BEAN:{
     "Good Sources of Fiber":{BRAN:"The fiber-rich outer layer of cereal grains.",LENTIL:"Lentils pack about 15 grams of fiber per cooked cup.",BEAN:"Beans are famously full of fiber."},
     "Slang for \"Head\"":{NOGGIN:"Informal for your head since the 1700s.",MELON:"Because heads are roughly melon-shaped??",BEAN:"As in \"Use your bean, Griffin!\""},
-    "Hit on the Head":{CLOCK:"To clock someone, hit them hard, usually up top.",CONK:"To conk someone on the head...bonk's older cousin.",BEAN:"Beaning is, in baseball, when the pitcher hits a player on the head."},
+    "In a Burrito":{SALSA:"The chunky tomato-and-pepper sauce spooned inside.",CHEESE:"Shredded and melty, the dairy layer.",BEAN:"Refried or whole, a protein-packed staple filling."},
     "Jelly ___":{FISH:"The gelatinous sea drifter that is mostly water and sting.",DONUT:"Fried dough with a jam-filled center.",BEAN:"The chewy, bean-shaped candy."}
   },
   SLIDE:{
@@ -1338,7 +1340,59 @@ function showResult(won,score,fancy,quiet){
   r.style.display="none"; r.innerHTML="";
   if(isBeta){ document.getElementById("fbCard").style.display=""; initFb(); }
   if(!quiet) openModal(fancy);
+  else if(dailyKey) showCommStats();   /* restored finished game: no modal, stats straight away */
   if(won){ if(quiet) renderTallyStatic(score); else runModalTally(score); }
+}
+/* ---------- community stats: "how everyone did" ----------
+   Fetched once per finished daily/archive game, revealed below the board after
+   the result modal closes. Quietly does nothing for beta/custom puzzles, when
+   the network fails, or when there isn't enough data yet. */
+let commStatsShown=false;
+const CS_MIN_PLAYS=15;
+function csDifficulty(avg){
+  /* four tiers from the community's average mistake count */
+  return avg<0.55?["Gentle",1]:avg<1.1?["Medium",2]:avg<1.8?["Tricky",3]:["Brutal",4];
+}
+function csBarRow(name,color,n,total,you){
+  const pct=total?Math.round(100*n/total):0;
+  return "<div class='cs-row'><span class='cs-name'>"+esc(name)+"</span>"+
+    "<span class='cs-bar'><i style='width:"+pct+"%;background:"+color+"'></i></span>"+
+    "<span class='cs-pct'>"+pct+"%</span>"+
+    (you?"<span class='cs-you'>You</span>":"<span class='cs-you' style='visibility:hidden'>You</span>")+"</div>";
+}
+function showCommStats(){
+  if(commStatsShown||!over||!dailyKey||!window.x43stats) return;
+  commStatsShown=true;
+  const el=document.getElementById("commStats");
+  const reveal=()=>{
+    el.style.display="";
+    if(G) G.from(el,{opacity:0,y:14,duration:.5,ease:"power2.out"});
+  };
+  x43stats(dailyKey).then(d=>{
+    if(!d||!d.ok) return;
+    const kicker="<div class='cs-kicker'>How everyone did</div>";
+    if((d.plays||0)<CS_MIN_PLAYS){
+      el.innerHTML=kicker+
+        "<p class='cs-note'>Not enough plays yet to say how hard this one was. Check back later — the stats fill in as more people finish.</p>";
+      reveal(); return;
+    }
+    const [dlabel,dfill]=csDifficulty(d.avg_m||0);
+    const meter="<span class='cs-meter'>"+[1,2,3,4].map(i=>"<i"+(i<=dfill?" class='on'":"")+"></i>").join("")+"</span>";
+    /* first category solved — real names, real colours, sorted most-first first */
+    const firsts=[0,1,2,3].map(i=>({i,n:d["f"+i]||0})).sort((a,b)=>b.n-a.n);
+    const firstRows=firsts.map(f=>csBarRow(cats[f.i].name,COLORS[f.i],f.n,d.ordn||0,false)).join("");
+    /* mistakes distribution, with the player's own bucket marked */
+    const myBucket=(mistakes>=MAXM)?3:mistakes;
+    const mist=[["Flawless","m0"],["One mistake","m1"],["Two mistakes","m2"],["Didn’t finish","m3"]];
+    const mistRows=mist.map((r,i)=>csBarRow(r[0],i===3?"#c98a80":"#8f8574",d[r[1]]||0,d.plays||0,i===myBucket)).join("");
+    el.innerHTML=kicker+
+      "<div class='cs-sub'>"+esc(fmtDate(dailyKey))+" · "+(d.plays||0).toLocaleString()+" players · "+Math.round(100*(d.wins||0)/(d.plays||1))+"% solved it</div>"+
+      "<div class='cs-diff'><span class='cs-label'>Difficulty</span>"+meter+"<b>"+dlabel+"</b>"+
+        "<span class='cs-hint'>"+(+(d.avg_m||0)).toFixed(1)+" avg mistakes</span></div>"+
+      "<div class='cs-sec'><div class='cs-label'>First category solved</div>"+firstRows+"</div>"+
+      "<div class='cs-sec'><div class='cs-label'>How it went</div>"+mistRows+"</div>";
+    reveal();
+  }).catch(()=>{ commStatsShown=false; }); /* network hiccup: allow a retry on the next close */
 }
 let modalLastFocus=null;
 function openModal(fancy){
@@ -1362,6 +1416,7 @@ function closeModal(){
   const back=modalLastFocus;
   if(back&&document.contains(back)&&back.offsetParent!==null) back.focus();
   else { const rb=document.getElementById("submitBtn"); if(rb&&rb.offsetParent!==null) rb.focus(); }
+  if(over&&dailyKey) showCommStats();   /* result put away → show how everyone did */
 }
 document.addEventListener("keydown",e=>{
   const m=document.getElementById("modal");
