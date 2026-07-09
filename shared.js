@@ -5,10 +5,41 @@
 /* ---------- accessibility settings (shared across all pages) ---------- */
 let A11Y={}; try{ A11Y=JSON.parse(localStorage.getItem("x43_a11y"))||{}; }catch(e){}
 function reduceMotion(){ return !!A11Y.rm; }   /* checked at animation time in index.html */
+
+/* ---------- dark mode ----------
+   A11Y.dk: 1 = force dark, 0 = force light, undefined = follow the OS.
+   We express the user's choice with html classes "dark"/"light" (which drive
+   the :root var override in shared.css) and ALSO resolve the *effective* theme
+   into a single "thm-dark" class so component rules need only one selector. */
+function darkMQ(){ return window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)"); }
+function effectiveDark(){
+  if(A11Y.dk!==undefined) return !!A11Y.dk;         /* explicit choice wins */
+  const mq=darkMQ(); return !!(mq&&mq.matches);      /* else follow the system */
+}
+/* keep the <meta name="theme-color"> (index only) in step with the theme */
+function applyThemeColor(){
+  const m=document.querySelector('meta[name="theme-color"]'); if(!m) return;
+  m.setAttribute("content", effectiveDark()?"#121212":"#faf7f1");
+}
+/* set html classes for the current A11Y.dk value + the resolved thm-dark flag */
+function applyTheme(){
+  const c=document.documentElement.classList;
+  c.toggle("dark",  A11Y.dk===1);
+  c.toggle("light", A11Y.dk===0);
+  c.toggle("thm-dark", effectiveDark());
+  applyThemeColor();
+}
+
 /* apply the html classes as early as possible (documentElement exists in <head>) */
 (function(){ const c=document.documentElement.classList;
   c.toggle("a11y-rm",!!A11Y.rm); c.toggle("a11y-hc",!!A11Y.hc); c.toggle("a11y-bt",!!A11Y.bt);
-  c.toggle("a11y-lc",!!A11Y.lc); c.toggle("a11y-oc",!!A11Y.oc); c.toggle("a11y-st",!!A11Y.st); })();
+  c.toggle("a11y-lc",!!A11Y.lc); c.toggle("a11y-oc",!!A11Y.oc); c.toggle("a11y-st",!!A11Y.st);
+  applyTheme();
+  /* when following the system, re-resolve if the OS theme flips mid-session */
+  const mq=darkMQ();
+  if(mq){ const onCh=()=>{ if(A11Y.dk===undefined) applyTheme(); };
+    if(mq.addEventListener) mq.addEventListener("change",onCh); else if(mq.addListener) mq.addListener(onCh); }
+})();
 
 /* category palette: 0 blue, 1 green, 2 yellow, 3 purple. "Labeled colors" mode keeps
    these and just adds the colour's name to each solved tile (no recolouring). */
@@ -89,7 +120,11 @@ function buildA11yMenu(){
   const menu=document.createElement("div");
   menu.id="a11yMenu"; menu.hidden=true; menu.setAttribute("role","group"); menu.setAttribute("aria-label","Accessibility options");
   const opt=(k,label)=>"<label class='a11y-opt'><input type='checkbox' data-k='"+k+"'"+(A11Y[k]?" checked":"")+"><span>"+label+"</span></label>";
-  menu.innerHTML=opt("rm","Reduced motion")+opt("hc","High contrast")+opt("lc","Labeled colors")+opt("oc","One card color")+opt("bt","Bigger text")+opt("st","Show timer");
+  /* Dark mode is special: its initial state follows the OS when unset, so it
+     can't use opt()'s "A11Y[k] is truthy" rule. Build it explicitly, first. */
+  const dkChecked=(A11Y.dk!==undefined)?!!A11Y.dk:!!(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const dkOpt="<label class='a11y-opt'><input type='checkbox' data-k='dk'"+(dkChecked?" checked":"")+"><span>Dark mode</span></label>";
+  menu.innerHTML=dkOpt+opt("rm","Reduced motion")+opt("hc","High contrast")+opt("lc","Labeled colors")+opt("oc","One card color")+opt("bt","Bigger text")+opt("st","Show timer");
   const host=document.querySelector(".wrap")||document.body;   /* inside the column so it mirrors the streak */
   host.appendChild(btn); host.appendChild(menu);
   function setOpen(o){
@@ -108,6 +143,7 @@ function buildA11yMenu(){
     const k=e.target.dataset&&e.target.dataset.k; if(!k) return;
     A11Y[k]=e.target.checked?1:0;
     try{ localStorage.setItem("x43_a11y",JSON.stringify(A11Y)); }catch(_){}
+    if(k==="dk"){ applyTheme(); return; }            /* dark mode drives its own html classes */
     document.documentElement.classList.toggle("a11y-"+k,!!A11Y[k]);   /* all modes apply live via the class */
   });
   document.addEventListener("click",()=>setOpen(false));

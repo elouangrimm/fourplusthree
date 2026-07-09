@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<!-- kept in step with the effective theme by applyThemeColor() in shared.js -->
+<meta name="theme-color" content="#faf7f1">
 <title>4 × 3</title>
 <script>
 /* Resolve relative assets (favicons, etc.) against this page's own folder so they
@@ -588,8 +590,8 @@ const LINE_ANGLES=[[315,135],[0,180],[90,270],[45,225]];
 function hubGradient(offset){
   offset=offset||0;
   const stops=[];
-  solvedIdx.forEach((ci)=>{ for(const a of LINE_ANGLES[ci]) stops.push([a,MIDC[ci]]); });
-  if(!stops.length) return "#fff";
+  solvedIdx.forEach((ci)=>{ for(const a of LINE_ANGLES[ci]) stops.push([a,"var(--m"+ci+")"]); }); /* themed mid-tones */
+  if(!stops.length) return "var(--card)";
   stops.sort((p,q)=>p[0]-q[0]);
   const first=stops[0], last=stops[stops.length-1];
   const full=[[last[0]-360,last[1]],...stops,[first[0]+360,first[1]]];
@@ -656,6 +658,7 @@ function paintTiles(){
     const back=t.querySelector(".tback");
     if(back) back.style.backgroundImage=(ci!==undefined&&!hubPlaced)?("url('"+BACKS[ci]+"')"):"";
     inner.classList.toggle("idle",!sel&&!hubPlaced&&ci===undefined); /* color drift only on plain tiles */
+    inner.classList.remove("cat0","cat1","cat2","cat3");
     if(sel){
       inner.style.background=""; inner.style.borderColor=""; inner.style.color="";
     } else if(hubPlaced){
@@ -663,7 +666,9 @@ function paintTiles(){
       inner.style.background=hubGradient();
       inner.style.borderColor="#d4a017"; inner.style.color="var(--ink)";
     } else if(ci!==undefined){
-      inner.style.background=TINTS[ci]; inner.style.borderColor=COLORS[ci]; inner.style.color=COLORS[ci];
+      /* themed via .cat classes (see shared.css) so dark mode gets its own tints */
+      inner.style.background=""; inner.style.borderColor=""; inner.style.color="";
+      inner.classList.add("cat"+ci);
     } else {
       inner.style.background=""; inner.style.borderColor=""; inner.style.color="";
     }
@@ -840,6 +845,18 @@ const DEFS={
     "Old School YouTube Formats":{HAUL:"A creator shows off stuff they just bought.",VLOG:"Often thought of as a day-in-the-life video diary.",TAG:"A video answering a set list of questions or tasks, then tagging others."},
     "What # Might Mean":{POUND:"On a phone keypad, the # key goes by this name.",NUMBER:"Put # in front of a figure and it means \"number\", as in #1.",TAG:"On social media, # turns a word into a clickable tag."},
     "Guys You Might Meet at the Skate Park":{DAN:"A perfectly ordinary lad.",PHIL:"Working on his kickflip.",TAG:"Short for \"Taggart,\" Tag is a super cool dude."}
+  },
+  STUD:{
+    "A Nice Big Man":{HUNK:"A strapping, good-looking fellow.",BABE:"A warm nickname for someone easy on the eyes.",STUD:"A guy who is, y'know...quite confident about his appeal."},
+    "Male Breeding Animals":{STALLION:"An uncastrated male horse kept for mating.",SIRE:"The father of a pedigreed animal.",STUD:"A male kept specifically to breed."},
+    "Types of Earrings":{HOOP:"A ring that loops through the lobe.",DROP:"A dangler that hangs below the ear.",STUD:"A small stud that sits flat against the lobe."},
+    "Behind the Drywall":{DUCT:"The metal tubing that carries heating and cooling air.",INSULATION:"The fluffy batting that keeps the warmth in.",STUD:"The vertical wood framing you hunt for before hanging a shelf."}
+  },
+  TAPE:{
+    "Music Storage Object":{VINYL:"A record...put the needle on and the grooves make sound.",CD:"The shiny disc that replaced cassettes in the 90s.",TAPE:"The magnetic ribbon in plastic that you'd rewind with a pencil."},
+    "Sticky Binders":{GLUE:"Any of a number of liquids that dry to bind things.",PASTE:"The gloopy adhesive that comes in a jar.",TAPE:"The sticky strip pulled off a roll."},
+    "Metaphorical Red Things":{HERRING:"A red herring is a misleading clue that throws you off the trail.",FLAG:"A red flag is a warning sign that something is wrong.",TAPE:"Red tape is maddening bureaucratic paperwork."},
+    "Scotch ___":{EGG:"A hard-boiled egg wrapped in sausage and fried.",WHISKY:"The smoky spirit distilled in Scotland.",TAPE:"The see-through desk roll from 3M."}
   }
 };
 /* post-game easter egg: tap the hub to press it in and burst out emojis */
@@ -1006,7 +1023,7 @@ function renderSolvedList(){
     const c=cats[ci];
     const div=document.createElement("div");
     div.className="scat";
-    div.style.background=TINTS[ci];
+    div.style.background="var(--t"+ci+")";   /* themed tint — matches the board tiles */
     const dmap = defsOn ? (DEFS[special][c.name]||{}) : null;
     const mk=(w,hub)=>{
       const def=dmap?dmap[w]:null, cl=[]; if(hub)cl.push("hub"); if(def)cl.push("def");
@@ -1016,7 +1033,7 @@ function renderSolvedList(){
     let wordsTxt;
     if(hubKnown()) wordsTxt=mk(c.words[0])+" · "+mk(special,true)+" · "+mk(c.words[1]);
     else wordsTxt=[...c.words,special].sort().map(w=>mk(w)).join(" · "); /* tooltips on from the first solve; no .hub class = no hub spoiler */
-    div.innerHTML="<b style='color:"+COLORS[ci]+"'>"+esc(c.name)+"</b><span>"+wordsTxt+"</span>";
+    div.innerHTML="<b style='color:var(--tc"+ci+")'>"+esc(c.name)+"</b><span>"+wordsTxt+"</span>";
     el.appendChild(div);
   });
   const last=el.lastElementChild;
@@ -2075,7 +2092,9 @@ function recordHistory(){
       const cs2=calcScore(), ct=catTelemetry();
       x43beacon({p:dailyKey, rel:(dailyKey===todayStr())?1:0, w:cs2.won?1:0,
         m:mistakes, s:cs2.score, ms:solveMs, st:streakWithToday(), ad:adClicked?1:0,
-        adid:adClickedId||window.x43ad||"",   /* the ad they clicked, else the one on screen */
+        /* the ad they clicked, else the one on screen — but dark mode hides ads,
+           so don't count an impression that nobody could have seen */
+        adid:adClickedId||(document.documentElement.classList.contains("thm-dark")?"":window.x43ad)||"",
         c:ct.c, so:ct.so});
     }
   }catch(e){}

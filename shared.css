@@ -2,7 +2,43 @@
     --c0:#5b8def; --c1:#56b870; --c2:#e7b416; --c3:#a06ee1;
     --ink:#2b2620; --paper:#faf7f1; --card:#ffffff; --line:#d8d2c6;
     --bad:#d05b5b; --good:#56b870;
+    /* neutral text/fill scale — light values are exactly the literals used before.
+       A single dark override block (below) remaps them for dark mode. */
+    --mut:#7a7264;    /* dominant muted body/label text */
+    --mut2:#a39a89;   /* lighter muted text (footer, close ×, cs-hint) */
+    --mut3:#8f8574;   /* uppercase micro-labels */
+    --mut4:#5d564a;   /* stronger muted text (cs-name, catbox label, hbadge) */
+    --mut5:#756d61;   /* Settings / streak tag (AA-min on paper) */
+    /* solved-card theming: tint fill, text, and hub-gradient mid-tones per category.
+       Light values = the TINTS / COLORS / MIDC constants in shared.js. */
+    --t0:#e8effc; --t1:#e6f4ea; --t2:#fcf3d7; --t3:#f1e8fa;
+    --tc0:#5b8def; --tc1:#56b870; --tc2:#e7b416; --tc3:#a06ee1;
+    --m0:#b1c9f7; --m1:#b3dcc0; --m2:#f3da8e; --m3:#d2b9f0;
+    --soft:#f1ece2;   /* hover / soft chip fill */
+    --soft2:#f4efe6;  /* #pSub pill fill */
+    --soft3:#f4efe5;  /* cs-bar track */
+    --card2:#faf7f1;  /* raised inner fill (tally-ico, achbox, row hover) */
+    --rule:#eee7d9;   /* faint hairline (cs-meter, cs-sec) */
   }
+  /* ===== dark mode ===== light stays pixel-identical; these only take effect
+     when <html> has class "dark" (explicit) or the OS prefers dark and the user
+     hasn't forced light. The var block is intentionally duplicated verbatim. */
+  html.dark{
+    --ink:#e8e8e8; --paper:#121212; --card:#1e1e1e; --line:#3a3a3a; --bad:#cf6679;
+    --mut:#a3a3a3; --mut2:#8c8c8c; --mut3:#969696; --mut4:#c6c6c6; --mut5:#a3a3a3;
+    --soft:#2a2a2a; --soft2:#262626; --soft3:#2a2a2a; --card2:#262626; --rule:#333333;
+    --t0:#1c2942; --t1:#1c3526; --t2:#3a2f10; --t3:#2f2145;
+    --tc0:#8ab1f7; --tc1:#7cd39d; --tc2:#f0c94f; --tc3:#c9a3f5;
+    --m0:#31486e; --m1:#2b4d36; --m2:#5b4718; --m3:#463063;
+  }
+  @media (prefers-color-scheme: dark){ html:not(.light){
+    --ink:#e8e8e8; --paper:#121212; --card:#1e1e1e; --line:#3a3a3a; --bad:#cf6679;
+    --mut:#a3a3a3; --mut2:#8c8c8c; --mut3:#969696; --mut4:#c6c6c6; --mut5:#a3a3a3;
+    --soft:#2a2a2a; --soft2:#262626; --soft3:#2a2a2a; --card2:#262626; --rule:#333333;
+    --t0:#1c2942; --t1:#1c3526; --t2:#3a2f10; --t3:#2f2145;
+    --tc0:#8ab1f7; --tc1:#7cd39d; --tc2:#f0c94f; --tc3:#c9a3f5;
+    --m0:#31486e; --m1:#2b4d36; --m2:#5b4718; --m3:#463063;
+  } }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   /* rapid taps on buttons (Deselect! tiles!) must never read as a double-tap zoom;
      manipulation still allows scrolling and pinch-zoom, just no double-tap zoom */
@@ -16,14 +52,14 @@
   .wrap{max-width:560px; margin:0 auto; padding:20px 16px 60px; position:relative;}
   /* subtle current-streak note tucked into the top-right, next to the logo */
   .streak-tag{position:absolute; top:18px; right:16px; z-index:5;   /* mirrors the Settings link on the left */
-    font-size:12px; font-weight:600; letter-spacing:.3px; color:#756d61;   /* AA-minimum contrast (~4.8:1) */
+    font-size:12px; font-weight:600; letter-spacing:.3px; color:var(--mut5);   /* AA-minimum contrast (~4.8:1) */
     text-decoration:none; line-height:1.2; text-align:right;}
   .streak-tag:hover{color:#59544a;}
   .streak-tag:focus-visible{outline:none; border-radius:4px; box-shadow:0 0 0 2px var(--paper),0 0 0 4px #1f6feb;}
   header{text-align:center; margin-bottom:14px;}
   h1{font-size:42px; margin:0; letter-spacing:2px;}
   .logo{width:168px; max-width:60%; display:block; margin:0 auto 6px;}
-  .tag{color:#7a7264; font-size:14px; margin-top:2px;}
+  .tag{color:var(--mut); font-size:14px; margin-top:2px;}
   nav{display:flex; justify-content:center; gap:8px; margin:18px 0;}
   nav button{border:1.5px solid var(--ink); background:transparent; color:var(--ink);
     padding:7px 18px; border-radius:999px; font-size:14px; font-weight:600; cursor:pointer;}
@@ -31,13 +67,13 @@
   .view{display:none;} .view.on{display:block;}
   .card{background:var(--card); border:1.5px solid var(--line); border-radius:14px; padding:16px; margin-bottom:14px;}
   .ptitle{text-align:center; font-weight:700; font-size:18px;}
-  .pauthor{text-align:center; color:#7a7264; font-size:13px; margin-top:2px;}
+  .pauthor{text-align:center; color:var(--mut); font-size:13px; margin-top:2px;}
   #pSub{width:fit-content; max-width:100%; margin-left:auto; margin-right:auto;
-    color:#9a8a6e; background:#f4efe6; border:1.5px solid var(--line);
+    color:#9a8a6e; background:var(--soft2); border:1.5px solid var(--line);
     border-radius:999px; padding:5px 16px; font-size:12px; font-weight:700;
     letter-spacing:1px; text-transform:uppercase;}
   #pSub.today{color:var(--ink); border:2.5px solid transparent; padding:5px 17px;
-    background:linear-gradient(#f4efe6,#f4efe6) padding-box,
+    background:linear-gradient(var(--soft2),var(--soft2)) padding-box,
       linear-gradient(100deg,var(--c0),var(--c1),var(--c2),var(--c3),var(--c2),var(--c1),var(--c0)) border-box;
     background-size:auto,320% 100%;
     animation:toastflow 4s ease-in-out infinite alternate;}
@@ -46,8 +82,8 @@
   .modes{display:flex; gap:10px; margin-top:14px;}
   .modes button{flex:1; padding:14px 10px; border-radius:12px; border:1.5px solid var(--ink);
     background:var(--card); cursor:pointer; font-size:15px; font-weight:700; color:var(--ink);}
-  .modes button small{display:block; font-weight:400; color:#7a7264; margin-top:4px; font-size:12px;}
-  .modes button:hover{background:#f1ece2;}
+  .modes button small{display:block; font-weight:400; color:var(--mut); margin-top:4px; font-size:12px;}
+  .modes button:hover{background:var(--soft);}
   /* board */
   #boardWrap{margin-top:4px;}
   #board{position:relative; width:100%;}
@@ -83,6 +119,11 @@
   }
   .tin.idle{animation:idledrift 16s linear infinite;}
   .tile.lock .tin{cursor:default;}
+  /* solved-category faces — vars, so a live theme flip recolours without a repaint */
+  .tin.cat0{background:var(--t0); border-color:var(--c0); color:var(--tc0);}
+  .tin.cat1{background:var(--t1); border-color:var(--c1); color:var(--tc1);}
+  .tin.cat2{background:var(--t2); border-color:var(--c2); color:var(--tc2);}
+  .tin.cat3{background:var(--t3); border-color:var(--c3); color:var(--tc3);}
   .ctrls{display:flex; justify-content:center; gap:10px; margin-top:16px;}
   .ctrls button, .hbtn{padding:9px 20px; border-radius:999px; border:1.5px solid var(--ink);
     background:transparent; font-weight:600; font-size:14px; cursor:pointer; color:var(--ink);}
@@ -93,10 +134,10 @@
   .hbtn:focus-visible, .yn button:focus-visible, .mclose:focus-visible, .fb .stars button:focus-visible{
     outline:none; box-shadow:0 0 0 2px var(--paper),0 0 0 4px #1f6feb;}
   .ctrls button:disabled{opacity:.35; cursor:default;}
-  .mist{text-align:center; margin-top:12px; font-size:14px; color:#7a7264;}
+  .mist{text-align:center; margin-top:12px; font-size:14px; color:var(--mut);}
   .mist i{display:inline-block; width:11px; height:11px; border-radius:50%; background:var(--bad); margin:0 3px;}
   .mist i.spent{background:#ddd5c7;}
-  .timer{display:none; text-align:center; margin-top:6px; font-size:14px; color:#7a7264; font-variant-numeric:tabular-nums;}
+  .timer{display:none; text-align:center; margin-top:6px; font-size:14px; color:var(--mut); font-variant-numeric:tabular-nums;}
   html.a11y-st .timer{display:block;}
   .solvedlist{margin-top:10px;}
   .scat{border-radius:10px; padding:5px 12px; margin:5px 0; text-align:center;
@@ -111,7 +152,7 @@
     width:88%; max-width:380px; max-height:86vh; overflow:auto;
     box-shadow:0 14px 44px rgba(43,38,32,.3);}
   .mclose{position:absolute; top:6px; right:12px; border:none; background:none; font-size:28px;
-    cursor:pointer; color:#a39a89; line-height:1; padding:4px;}
+    cursor:pointer; color:var(--mut2); line-height:1; padding:4px;}
   .mclose:hover{color:var(--ink);}
   .shinewrap{position:absolute; inset:0; border-radius:inherit; overflow:hidden; pointer-events:none;}
   .shinewrap .streak{position:absolute; top:-60%; left:0; width:34%; height:220%;
@@ -142,12 +183,12 @@
   .rowbtns{display:flex; justify-content:center; gap:10px; flex-wrap:wrap;}
   /* builder */
   .f label{display:block; font-size:12px; font-weight:700; text-transform:uppercase;
-    letter-spacing:.5px; color:#7a7264; margin:10px 0 3px;}
+    letter-spacing:.5px; color:var(--mut); margin:10px 0 3px;}
   .f input{width:100%; padding:10px 12px; border:1.5px solid var(--line); border-radius:8px;
-    font-size:16px; background:#fff; color:var(--ink);}   /* 16px keeps iOS from zooming on focus */
+    font-size:16px; background:var(--card); color:var(--ink);}   /* 16px keeps iOS from zooming on focus */
   .f input:focus{outline:none; border-color:var(--ink);}
   .catbox{border:none; border-radius:12px; padding:6px 14px 14px; margin-top:12px;}
-  .catbox label{color:#5d564a;}
+  .catbox label{color:var(--mut4);}
   .two{display:flex; gap:8px;} .two>div{flex:1; min-width:0;}
   /* phones: stack the side-by-side input pairs and let action buttons wrap full-width */
   @media (max-width:480px){
@@ -158,27 +199,27 @@
   }
   .vmsg{font-size:13.5px; margin:4px 0;}
   .vmsg.err{color:var(--bad);} .vmsg.ok{color:var(--good); font-weight:600;}
-  .linkbox{background:#f1ece2; border-radius:8px; padding:9px 10px; font-size:12px;
+  .linkbox{background:var(--soft); border-radius:8px; padding:9px 10px; font-size:12px;
     word-break:break-all; margin:6px 0; max-height:64px; overflow:auto;}
-  .hint{font-size:12.5px; color:#7a7264; margin-top:8px;}
+  .hint{font-size:12.5px; color:var(--mut); margin-top:8px;}
   /* community stats — quiet, editorial, rule-lined (NYT-ish) */
   .cstats{padding:18px 18px 14px;}
   .cs-kicker{font-size:11.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
     color:var(--ink); border-bottom:2px solid var(--ink); padding-bottom:7px;}
-  .cs-sub{font-size:13px; color:#7a7264; margin:8px 0 2px; font-variant-numeric:tabular-nums;}
-  .cs-note{font-size:14px; color:#7a7264; margin:12px 0 4px; line-height:1.55;}
+  .cs-sub{font-size:13px; color:var(--mut); margin:8px 0 2px; font-variant-numeric:tabular-nums;}
+  .cs-note{font-size:14px; color:var(--mut); margin:12px 0 4px; line-height:1.55;}
   .cs-diff{display:flex; align-items:center; gap:10px; margin:14px 0 2px; font-size:14px;}
   .cs-diff b{font-weight:700;}
-  .cs-hint{font-size:12px; color:#a39a89; font-variant-numeric:tabular-nums;}
+  .cs-hint{font-size:12px; color:var(--mut2); font-variant-numeric:tabular-nums;}
   .cs-meter{display:inline-flex; gap:3px;}
-  .cs-meter i{width:20px; height:8px; border-radius:2px; background:#eee7d9;}
+  .cs-meter i{width:20px; height:8px; border-radius:2px; background:var(--rule);}
   .cs-meter i.on{background:var(--ink);}
-  .cs-label{font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#8f8574;}
-  .cs-sec{margin-top:16px; padding-top:12px; border-top:1px solid #eee7d9;}
+  .cs-label{font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--mut3);}
+  .cs-sec{margin-top:16px; padding-top:12px; border-top:1px solid var(--rule);}
   .cs-sec .cs-label{display:block; margin-bottom:8px;}
   .cs-row{display:flex; align-items:center; gap:10px; margin:6px 0; font-size:13.5px;}
-  .cs-name{flex:0 0 96px; text-align:right; color:#5d564a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .cs-bar{flex:1; height:13px; background:#f4efe5; border-radius:3px; overflow:hidden;}
+  .cs-name{flex:0 0 96px; text-align:right; color:var(--mut4); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .cs-bar{flex:1; height:13px; background:var(--soft3); border-radius:3px; overflow:hidden;}
   .cs-bar i{display:block; height:100%; border-radius:3px; min-width:2px;}
   .cs-pct{flex:0 0 38px; font-weight:600; font-variant-numeric:tabular-nums; text-align:right;}
   .cs-you{font-size:10px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
@@ -194,10 +235,10 @@
   .yn button.on{background:var(--ink); color:var(--paper);}
   /* stats */
   .statgrid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:12px;}
-  .stat{background:#f1ece2; border-radius:10px; padding:14px; text-align:center;}
+  .stat{background:var(--soft); border-radius:10px; padding:14px; text-align:center;}
   .stat b{display:block; font-size:28px;}
-  .stat span{font-size:12.5px; color:#7a7264;}
-  footer{text-align:center; font-size:12px; color:#a39a89; margin-top:26px;}
+  .stat span{font-size:12.5px; color:var(--mut);}
+  footer{text-align:center; font-size:12px; color:var(--mut2); margin-top:26px;}
   footer a{color:inherit; text-decoration:underline; cursor:pointer;}
   footer a:hover{color:var(--ink);}
   footer a:focus-visible{outline:none; border-radius:4px; box-shadow:0 0 0 2px var(--paper),0 0 0 4px #1f6feb;}
@@ -207,17 +248,17 @@
     width:100%; text-align:left; padding:11px 14px; border:1.5px solid var(--line);
     border-radius:10px; background:var(--card); color:var(--ink); cursor:pointer;
     font-size:15px; font-weight:600;}
-  .archlist button:hover{background:#f1ece2;}
+  .archlist button:hover{background:var(--soft);}
   .archlist button.cur{border-color:var(--ink);}
-  .archlist button .when{font-size:12px; color:#7a7264; font-weight:400; white-space:nowrap;}
+  .archlist button .when{font-size:12px; color:var(--mut); font-weight:400; white-space:nowrap;}
   .archlist button:focus-visible{outline:none; box-shadow:0 0 0 2px var(--paper),0 0 0 4px #1f6feb;}
   /* scoring */
   .scoresec{margin-top:16px;}
-  .scoresec>b{font-size:11px; letter-spacing:1px; text-transform:uppercase; color:#7a7264; display:block; margin-bottom:2px;}
+  .scoresec>b{font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--mut); display:block; margin-bottom:2px;}
   .srow{display:flex; justify-content:space-between; align-items:baseline; gap:14px; padding:8px 0; border-top:1px solid var(--line); font-size:14px; line-height:1.35;}
   .srow .v{font-weight:700; white-space:nowrap;}
   .srow .v.good{color:#3b8f57;} .srow .v.bad{color:var(--bad);}
-  .srow .sd{color:#7a7264; font-size:13px; text-align:right; max-width:56%;}
+  .srow .sd{color:var(--mut); font-size:13px; text-align:right; max-width:56%;}
   .scat .def{cursor:help;
     text-decoration:underline dashed rgba(43,38,32,.4);
     text-decoration-thickness:1px; text-underline-offset:3px;}
@@ -245,6 +286,9 @@
   /* Ask Hank Anything brand: cream → orange, orange border, brown text */
   /* text-only ads (no standing figure) shouldn't reserve the left image gutter */
   .promo-banner-plain{padding-left:16px;}
+  /* SMUSH wordmark sits vertically centred at the left */
+  .promo-smush{position:absolute; left:10px; top:50%; transform:translateY(-50%); width:96px; height:auto; margin:0;}
+  .promo-banner-smush{padding-left:118px;}
   /* Something Worth Knowing (SoCal event) — poster colour scheme: indigo/red-orange, gold, cream */
   .promo-poster{position:absolute; left:9px; top:50%; transform:translateY(-50%); width:110px; height:auto; border-radius:6px;}
   .promo-banner-swk{padding-left:134px; color:#f3ecdd;
@@ -316,11 +360,11 @@
   .tally-count{font-size:54px; font-weight:800; text-align:center; color:var(--ink); line-height:1; margin:6px 0 12px;}
   .tally-icons{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; min-height:1px;}
   .tally-ico{width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-size:22px;
-    border-radius:10px; border:1.5px solid var(--line); background:#faf7f1; cursor:help; user-select:none;}
+    border-radius:10px; border:1.5px solid var(--line); background:var(--card2); cursor:help; user-select:none;}
   /* readable award rows: icon · description · coloured points, stays on screen for screenshots */
   .tally-list{display:flex; flex-direction:column; gap:7px; max-width:300px; margin:2px auto 12px;}
   .tally-row{display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:11px;
-    border:1.5px solid var(--line); background:#fff; box-shadow:0 1px 4px rgba(43,38,32,.06);
+    border:1.5px solid var(--line); background:var(--card); box-shadow:0 1px 4px rgba(43,38,32,.06);
     will-change:transform,opacity;}
   .tally-row .tr-ico{flex:none; width:24px; text-align:center; font-size:21px; line-height:1;}
   .tally-row .tr-label{flex:1; text-align:left; font-size:13.5px; font-weight:600; color:var(--ink); line-height:1.25;}
@@ -344,18 +388,18 @@
   .hstats{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:10px;}
   .hstat{border-radius:12px; padding:13px 12px; text-align:center; border:1.5px solid transparent;}
   .hstat b{display:block; font-size:26px; font-weight:800; line-height:1.1;}
-  .hstat span{font-size:12px; color:#7a7264;}
+  .hstat span{font-size:12px; color:var(--mut);}
   .hstat.c0{background:#eef4fe; border-color:#d3e1fb;} .hstat.c0 b{color:#3f6fd0;}
   .hstat.c1{background:#edf7f0; border-color:#d1e9d8;} .hstat.c1 b{color:#3f9b5e;}
   .hstat.c2{background:#fcf6e2; border-color:#efe2b4;} .hstat.c2 b{color:#b3870f;}
   .hstat.c3{background:#f5eefb; border-color:#e6d5f3;} .hstat.c3 b{color:#8a55c9;}
   /* achievements rectangle */
   .ach-box{border:1.5px solid var(--line); border-radius:14px; padding:14px 14px 15px; margin-top:14px; background:var(--card);}
-  .ach-box>b{font-size:11px; letter-spacing:1px; text-transform:uppercase; color:#7a7264; display:block; margin-bottom:11px;}
+  .ach-box>b{font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--mut); display:block; margin-bottom:11px;}
   .ach-grid{display:flex; flex-wrap:wrap; gap:8px;}
   .achbox{width:46px; height:46px; display:flex; align-items:center; justify-content:center;
     font-size:24px; line-height:1; border-radius:11px; border:1.5px solid var(--line);
-    background:#faf7f1; cursor:help; user-select:none;}
+    background:var(--card2); cursor:help; user-select:none;}
   .achbox.locked{color:#bfb7a7; background:#f2eee6; font-weight:700; font-size:20px;}
   .histlist{display:flex; flex-direction:column; gap:8px; margin-top:14px;}
   .histrow{border:1.5px solid var(--line); border-radius:10px; padding:10px 13px; background:var(--card);}
@@ -363,10 +407,10 @@
   .histrow .hh-date{font-weight:700; font-size:14px;}
   .histrow .hh-score{font-weight:800; font-size:14px; white-space:nowrap;}
   .histrow .hh-score.loss{color:var(--bad);}
-  .histrow .hh-meta{font-size:12.5px; color:#7a7264; margin-top:2px;}
+  .histrow .hh-meta{font-size:12.5px; color:var(--mut); margin-top:2px;}
   .histrow .hh-badges{display:flex; flex-wrap:wrap; gap:5px; margin-top:7px;}
   .histrow.tappable{cursor:pointer;}
-  .histrow.tappable:hover{background:#faf7f1; border-color:#cfc7b8;}
+  .histrow.tappable:hover{background:var(--card2); border-color:#cfc7b8;}
   .hh-cardlink{color:#7d3fc4; font-weight:700; white-space:nowrap;}
   #cardLightbox{position:fixed; inset:0; z-index:120; display:none; align-items:center; justify-content:center;
     background:rgba(43,38,32,.62); padding:20px; cursor:zoom-out;}
@@ -374,7 +418,7 @@
   #cardLightbox img{max-width:min(420px,92vw); max-height:90vh; width:auto; border-radius:14px;
     box-shadow:0 14px 44px rgba(0,0,0,.4);}
   .hbadge{font-size:10.5px; font-weight:700; letter-spacing:.3px; text-transform:uppercase;
-    padding:2px 8px; border-radius:999px; background:#f1ece2; color:#5d564a; border:1px solid var(--line);}
+    padding:2px 8px; border-radius:999px; background:var(--soft); color:var(--mut4); border:1px solid var(--line);}
   .hbadge.gold{background:linear-gradient(120deg,#f7e7a8,#d8b24a); color:#5a4406; border-color:#caa53a;}
   .hbadge.silver{background:linear-gradient(120deg,#eef1f5,#c2c9d4); color:#4a505c; border-color:#b8bfca;}
   .hbadge.rule{background:#f3dada; color:#7a2e22; border-color:#e0b3b3;}
@@ -383,15 +427,15 @@
   /* "Settings" link, upper-left of the column — exact mirror of the streak tag */
   #a11yBtn{position:absolute; top:18px; left:16px; z-index:5; border:0; background:none; padding:0;
     font-family:inherit; font-size:12px; font-weight:600; letter-spacing:.3px; line-height:1.2;
-    color:#756d61; cursor:pointer; text-align:left;}   /* AA-minimum contrast (~4.8:1) */
+    color:var(--mut5); cursor:pointer; text-align:left;}   /* AA-minimum contrast (~4.8:1) */
   #a11yBtn:hover{color:#59544a;}
   #a11yBtn:focus-visible{outline:none; border-radius:4px; box-shadow:0 0 0 2px var(--paper),0 0 0 4px #1f6feb;}
   #a11yMenu{position:absolute; top:42px; left:16px; z-index:140; background:var(--card); border:1.5px solid var(--line);
     border-radius:12px; padding:10px; box-shadow:0 8px 26px rgba(43,38,32,.22); min-width:196px;}
   #a11yMenu[hidden]{display:none;}
-  #a11yMenu .a11y-h{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#7a7264; margin:2px 4px 8px;}
+  #a11yMenu .a11y-h{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--mut); margin:2px 4px 8px;}
   .a11y-opt{display:flex; align-items:center; gap:9px; padding:7px 6px; border-radius:8px; font-size:14px; cursor:pointer;}
-  .a11y-opt:hover{background:#f1ece2;}
+  .a11y-opt:hover{background:var(--soft);}
   .a11y-opt input{width:18px; height:18px; flex:none; cursor:pointer;}
   .a11y-opt:focus-within{box-shadow:0 0 0 2px var(--paper),0 0 0 4px #1f6feb;}
 
@@ -415,7 +459,7 @@
   .a11y-hc .srow .sd, .a11y-hc .streak-tag, .a11y-hc #a11yBtn, .a11y-hc .stat span, .a11y-hc .cell .auth{color:#3a3128 !important;}
   .a11y-hc footer a{color:#15120d;}
   .a11y-hc .tin{border-width:2px; border-color:#6a6253;}
-  .a11y-hc .card, .a11y-hc .histrow, .a11y-hc .archlist button, .a11y-hc .tally-row{border-color:#7a7264;}
+  .a11y-hc .card, .a11y-hc .histrow, .a11y-hc .archlist button, .a11y-hc .tally-row{border-color:var(--mut);}
 
   /* ---------- a11y: bigger text ---------- */
   .a11y-bt .tin{font-size:clamp(13px,4.2vw,18px);}
@@ -426,3 +470,100 @@
   .a11y-bt .tally-count{font-size:62px;}
   .a11y-bt .hh-date, .a11y-bt .hh-score, .a11y-bt footer{font-size:15px;}
   .a11y-bt .f input, .a11y-bt .f label{font-size:16px;}
+
+  /* =====================================================================
+     DARK MODE — component overrides.
+     shared.js resolves the effective theme (explicit class OR system pref)
+     and adds class "thm-dark" to <html>, so every rule below is a single
+     selector. The :root variables (top of file) already carry most of the
+     work; these handle literals that couldn't be var-ified and JS-painted
+     pastel cards whose inherited var(--ink) text would flip to light.
+     Nothing here affects light mode.
+     ===================================================================== */
+  /* page background: same grain noise, near-flat Material #121212 */
+  html.thm-dark body{
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E") fixed,
+      var(--paper) linear-gradient(180deg,#181818 0%,var(--paper) 45%,#0e0e0e 100%) fixed;}
+
+  /* the logo carries its own paper background — frame it as a rounded card so
+     it reads as deliberate on the dark page instead of a hard-edged rectangle */
+  html.thm-dark .logo{background:#faf7f1; border-radius:16px; padding:7px 10px;
+    box-shadow:0 2px 12px rgba(0,0,0,.45);}
+
+  /* one-off muted-text literals not covered by the var scale */
+  html.thm-dark .streak-tag:hover,
+  html.thm-dark #a11yBtn:hover{color:#c6c6c6;}
+  html.thm-dark #pSub{color:#bb86fc;}                 /* Material primary as the small accent */
+  html.thm-dark .mist i.spent{background:#3a3a3a;}    /* was #ddd5c7 */
+
+  /* betabanner: warm gold note → gold on dark surface */
+  html.thm-dark .betabanner{background:#1e1e1e; border-color:#8a6f1e; color:var(--ink);}
+
+  /* idle-card drift + one-card mode: faint pale tints → faint dark tints.
+     (JS never paints these; they're pure CSS backgrounds.) */
+  html.thm-dark .tin.idle{animation:idledrift-dk 16s linear infinite;}
+  @keyframes idledrift-dk{
+    0%{background-color:#2a2b2f;} 25%{background-color:#2a2e2b;}
+    50%{background-color:#2e2c26;} 75%{background-color:#2c2a2f;}
+    100%{background-color:#2a2b2f;}
+  }
+  html.thm-dark .a11y-oc .tin.idle{background-color:#282d2b !important;}
+  /* tback easter-egg image sits on a neutral fill; keep it subtle in dark */
+  html.thm-dark .tback{background-color:#33413f;}
+
+  /* tally rows: pale success/error/achievement tints → dark tints
+     (COLORS/borders stay; only the pale fill flips) */
+  html.thm-dark .tally-row.pos{background:linear-gradient(var(--card),#1f2b25);}
+  html.thm-dark .tally-row.neg{background:linear-gradient(var(--card),#2f1e23);}   /* error-tinged */
+  html.thm-dark .tally-row.ach{background:linear-gradient(var(--card),#2b2720);}
+
+  /* history colour stat squares: pale pastel cards stay (physical-card feel),
+     but the muted <span> caption (var(--mut)) would be light-on-pale → pin it.
+     The coloured <b> values already use dark literals, readable on the pastels. */
+  html.thm-dark .hstat span{color:#5a5245;}
+  /* locked achievement chips: pale fill + faint text → dark fill + faint text */
+  html.thm-dark .achbox.locked{background:#262626; color:#8a8a8a;}
+
+  /* rule-breaker history badge: Material error pink on a dark chip */
+  html.thm-dark .hbadge.rule{background:#2b191e; color:#cf6679; border-color:#5e3440;}
+
+  /* selected tiles: light mode inverts to an ink card, but inverting in dark
+     produces a glaring light tile — use a raised dark gray with a bright edge */
+  html.thm-dark .tile.sel .tin{background:#3f3f3f; color:#ffffff; border-color:#cfcfcf;}
+
+  /* ads are light-designed; hide them in dark mode for now */
+  html.thm-dark .promo-banner, html.thm-dark .promo-side{display:none !important;}
+
+  /* solved rows (.scat) now use the themed --t/--tc vars, so their text can
+     stay var(--ink) in both modes; just brighten the gold hub + dashed
+     tooltip underlines so they read on the dark tints */
+  html.thm-dark .scat .hub{color:#d9a92d;}
+  /* builder category boxes use the themed --t vars now; their labels
+     (var(--mut4)) read fine on the dark tints without a pin */
+
+  /* deftip tooltip flips with --ink/--paper already (uses vars); the dashed
+     underline needs a light ink on the dark tints */
+  html.thm-dark .scat .def{text-decoration-color:rgba(232,232,232,.45);}
+  html.thm-dark .scat .hub.def{text-decoration-color:rgba(217,169,45,.6);}
+
+  /* high-contrast + dark: the a11y-hc rules assume a light page. Re-light the
+     forced-dark text so HC stays high-contrast on a dark background. */
+  html.thm-dark.a11y-hc body{color:#ffffff;}
+  html.thm-dark.a11y-hc .tag, html.thm-dark.a11y-hc .hint, html.thm-dark.a11y-hc footer,
+  html.thm-dark.a11y-hc .pauthor, html.thm-dark.a11y-hc .srow .sd, html.thm-dark.a11y-hc .streak-tag,
+  html.thm-dark.a11y-hc #a11yBtn, html.thm-dark.a11y-hc .stat span,
+  html.thm-dark.a11y-hc .cell .auth{color:#e0e0e0 !important;}
+  html.thm-dark.a11y-hc footer a{color:#ffffff;}
+  html.thm-dark.a11y-hc .tin{border-color:#bdbdbd;}
+
+  /* shadows: the warm rgba(43,38,32,…) shadows all but vanish on a dark page.
+     Restrengthen the raised surfaces with a darker, slightly deeper shadow. */
+  html.thm-dark .mcard{box-shadow:0 14px 44px rgba(0,0,0,.55);}
+  html.thm-dark .mback{background:rgba(0,0,0,.6);}
+  html.thm-dark .toast{box-shadow:0 6px 18px rgba(0,0,0,.5);}
+  html.thm-dark #a11yMenu{box-shadow:0 8px 26px rgba(0,0,0,.5);}
+  html.thm-dark #deftip{box-shadow:0 6px 18px rgba(0,0,0,.5);}
+  html.thm-dark .tally-row{box-shadow:0 1px 4px rgba(0,0,0,.35);}
+  html.thm-dark .streak-hero{box-shadow:0 10px 26px rgba(0,0,0,.45);}
+  html.thm-dark #cardLightbox{background:rgba(0,0,0,.78);}

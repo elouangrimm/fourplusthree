@@ -71,7 +71,7 @@ function gameURL(hash){ return location.href.split("#")[0].split("?")[0].replace
 function buildInputs(){
   let h="";
   for(let i=0;i<4;i++){
-    h+="<div class='catbox' style='background:"+TINTS[COL_ORDER[i]]+"'>"+
+    h+="<div class='catbox' style='background:var(--t"+COL_ORDER[i]+")'>"+
       "<label>Category "+(i+1)+" name</label><input id='bCat"+i+"' placeholder='e.g. Planets' oninput='validateBuilder()'>"+
       "<div class='two'>"+
       "<div><label>Word A</label><input id='bW"+i+"a' oninput='validateBuilder()'></div>"+
@@ -110,7 +110,7 @@ function validateBuilder(){
     v.innerHTML=errs.map(e=>"<div class='vmsg err'>✗ "+esc(e)+"</div>").join("");
   } else {
     v.innerHTML="<div class='vmsg ok'>✓ Structure checks out: 9 unique words, special word in all four categories.</div>"+
-      "<div class='vmsg' style='color:#7a7264'>One thing I can't check: make sure each regular word fits <i>only</i> its own category — that's what your beta testers are for.</div>";
+      "<div class='vmsg' style='color:var(--mut)'>One thing I can't check: make sure each regular word fits <i>only</i> its own category — that's what your beta testers are for.</div>";
   }
   const good=errs.length===0;
   document.getElementById("bMake").disabled=!good;
