@@ -307,7 +307,9 @@
     .promo-banner{display:none;}
     /* anchored to the RIGHT EDGE OF THE CENTERED COLUMN (50% + half the 560px wrap),
        not the viewport edge, so it can never drift over the board */
-    .promo-side{display:block; position:fixed; top:50%; transform:translateY(-50%);
+    /* pinned just below where the board starts (not centered in the viewport,
+       which made it wander with window height) */
+    .promo-side{display:block; position:fixed; top:236px; transform:none;
       left:calc(50% + 296px); right:auto; width:200px; color:#3a3128;
       background:linear-gradient(160deg,#dee8fb,#def0e3 34%,#f9efcd 67%,#ebdff8);
       border:1.5px solid rgba(120,100,150,.28); border-radius:16px; padding:16px 16px 18px;
